@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>เส้นทางนักเทคโนโลยีสุขภาพ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
 @media (orientation:portrait){:root{--cw:min(28vw,17vh)}}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;font-family:'Prompt',sans-serif;background:var(--bg);color:var(--ink);user-select:none;-webkit-user-select:none;touch-action:none}
-.screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2vmin 3vmin;gap:2.4vmin;overflow:hidden}
+.screen{position:fixed;left:var(--ax,0px);top:var(--ay,0px);width:var(--aw,100vw);height:var(--ah,100dvh);display:none;flex-direction:column;align-items:center;justify-content:center;padding:2vmin 3vmin;gap:2.4vmin;overflow:hidden}
 .screen.active{display:flex}
 h1{font-size:clamp(28px,8vmin,80px);font-weight:600;color:var(--teal-d);text-align:center;line-height:1.2}
 .sub{font-size:clamp(14px,3vmin,30px);color:var(--muted);text-align:center}
@@ -310,9 +310,9 @@ function handLoop(){
     if(res.landmarks && res.landmarks.length){
       const lm = res.landmarks[0];
       const mx = (lm[4].x + lm[8].x)/2, my = (lm[4].y + lm[8].y)/2;
-      const mxg = innerHeight > innerWidth ? 0.25 : 0.15;
-      const tx = clamp((1 - mx - mxg)/(1 - 2*mxg), 0, 1) * innerWidth;
-      const ty = clamp((my - 0.12)/0.6, 0, 1) * innerHeight;
+      const mxg = VP.h > VP.w ? 0.25 : 0.15;
+      const tx = VP.x + clamp((1 - mx - mxg)/(1 - 2*mxg), 0, 1) * VP.w;
+      const ty = VP.y + clamp((my - 0.12)/0.6, 0, 1) * VP.h;
       sm.x += (tx - sm.x)*0.45; sm.y += (ty - sm.y)*0.45;
       cursor.style.display = 'block';
       cursor.style.left = sm.x + 'px'; cursor.style.top = sm.y + 'px';
@@ -343,13 +343,24 @@ function updateHover(x,y){
 const board = $('board'), token = $('token');
 const SQUARES = 20;
 let COLS = 7, ROWS = 5;
-function setGrid(){ if(innerHeight > innerWidth){ COLS = 5; ROWS = 7; } else { COLS = 7; ROWS = 5; } }
+function setGrid(){ if(VP.h > VP.w){ COLS = 5; ROWS = 7; } else { COLS = 7; ROWS = 5; } }
 function sqPos(i){
   const C = COLS, R = ROWS;
   if(i < C) return {c:i, r:0};
   i -= C; if(i < R-2) return {c:C-1, r:i+1};
   i -= R-2; if(i < C) return {c:C-1-i, r:R-1};
   i -= C; return {c:0, r:R-2-i};
+}
+/* ขนาดพื้นที่ที่มองเห็นจริง (กันล้นจอบนมือถือ เมื่อแถบที่อยู่เว็บโผล่ หรือหน้าถูกซูม) */
+const VP = {x:0, y:0, w:innerWidth, h:innerHeight};
+function fitViewport(){
+  const v = window.visualViewport;
+  VP.w = v ? v.width : innerWidth; VP.h = v ? v.height : innerHeight;
+  VP.x = v ? v.offsetLeft : 0;    VP.y = v ? v.offsetTop : 0;
+  const r = document.documentElement.style;
+  r.setProperty('--aw', VP.w+'px'); r.setProperty('--ah', VP.h+'px');
+  r.setProperty('--ax', VP.x+'px'); r.setProperty('--ay', VP.y+'px');
+  if(typeof layoutBoard === 'function') layoutBoard();
 }
 const DECO = ['❤️','💊','🩻','🧬','🩹','🌡️'];
 function buildBoard(){
@@ -378,7 +389,11 @@ function layoutBoard(){
   if(G) placeToken(G.pos);
 }
 function placeToken(i){ const {c,r} = sqPos(i); token.style.left = ((c+.5)/COLS*100)+'%'; token.style.top = ((r+.5)/ROWS*100)+'%'; }
-window.addEventListener('resize', layoutBoard);
+window.addEventListener('resize', fitViewport);
+window.addEventListener('orientationchange', ()=>setTimeout(fitViewport, 300));
+if(window.visualViewport){ visualViewport.addEventListener('resize', fitViewport); visualViewport.addEventListener('scroll', fitViewport); }
+document.addEventListener('gesturestart', e=>e.preventDefault());
+document.addEventListener('dblclick', e=>e.preventDefault());
 
 /* ===== สถานะเกม ===== */
 let G = null, rolling = false;
@@ -512,7 +527,7 @@ function showSummary(){
   const list = G.played.map(id=>{ const s = STATIONS.find(x=>x.id===id); return `${s.icon} ${s.name}: ${G.scores[id]}`; }).join('<br>');
   $('careerCard').innerHTML = `<div class="sub">คุณเหมาะกับ…</div><div class="em">${st.icon}</div><h2>${st.career}</h2><p>${st.careerDesc}</p><div class="scoreList">${list}</div><span class="tag">เรียนได้ที่ ${CONFIG.programName}</span>`;
   const qr = $('qr'); qr.innerHTML = '';
-  if(window.QRCode) { const q = Math.round(Math.min(210, Math.max(110, Math.min(innerWidth,innerHeight)*0.24))); new QRCode(qr, {text:CONFIG.applyUrl, width:q, height:q}); }
+  if(window.QRCode) { const q = Math.round(Math.min(210, Math.max(110, Math.min(VP.w,VP.h)*0.24))); new QRCode(qr, {text:CONFIG.applyUrl, width:q, height:q}); }
   else qr.textContent = CONFIG.applyUrl;
   show('summary');
   let left = CONFIG.idleReset;
@@ -531,6 +546,7 @@ $('btnMouse').onclick = newGame;
 $('btnGo').onclick = newGame;
 $('btnRoll').onclick = roll;
 $('btnAgain').onclick = () => { clearInterval(resetTimer); newGame(); };
+fitViewport();
 </script>
 </body>
 </html>
