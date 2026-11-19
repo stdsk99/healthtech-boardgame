@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เส้นทางนักเทคโนโลยีสุขภาพ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--bg:#eef7f5;--teal:#0f8a74;--teal-d:#085041;--coral:#e0653a;--ink:#1d2b2a;--muted:#5f6f6c;--green:#2e9e5b;--red:#d64545}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Prompt',sans-serif;background:var(--bg);color:var(--ink);user-select:none;-webkit-user-select:none;touch-action:none}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2vh 3vw;gap:2.5vh}
+.screen.active{display:flex}
+h1{font-size:clamp(32px,5.5vw,80px);font-weight:600;color:var(--teal-d);text-align:center;line-height:1.2}
+.sub{font-size:clamp(16px,2vw,30px);color:var(--muted);text-align:center}
+.btn{font-family:inherit;font-size:clamp(18px,2.3vw,34px);font-weight:500;padding:.55em 1.4em;border-radius:999px;border:3px solid var(--teal);background:#fff;color:var(--teal-d);cursor:pointer;transition:transform .15s,background .15s}
+.btn.primary{background:var(--teal);color:#fff}
+.btn:hover,.btn.hover{transform:scale(1.07);background:#d9f2ec}
+.btn.primary:hover,.btn.primary.hover{background:#0b6e5c}
+.row{display:flex;gap:2vw;flex-wrap:wrap;justify-content:center}
+.howto{display:flex;gap:3vw;font-size:clamp(14px,1.6vw,24px);color:var(--muted);text-align:center}
+.howto div{background:#fff;border-radius:18px;padding:1.2vh 1.6vw;border:2px solid #cfe5df}
+.howto b{display:block;font-size:clamp(30px,4vw,56px)}
+#status{font-size:clamp(14px,1.4vw,20px);color:var(--muted);min-height:1.5em}
+#cursor{position:fixed;left:0;top:0;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:5px solid var(--coral);background:rgba(224,101,58,.15);pointer-events:none;z-index:9999;display:none}
+#cursor.pinch{width:30px;height:30px;margin:-15px 0 0 -15px;background:var(--coral)}
+#cam{position:fixed;right:12px;bottom:12px;width:180px;border-radius:12px;transform:scaleX(-1);border:3px solid #fff;z-index:50;display:none;opacity:.85;pointer-events:none}
+#handPill{position:fixed;right:12px;top:12px;z-index:60;font-size:14px;padding:4px 12px;border-radius:999px;background:#fff;border:2px solid #cfe5df;display:none;pointer-events:none}
+#board{position:relative;width:min(94vw,148vh);height:min(90vh,63vw)}
+.sq{position:absolute;padding:5px}
+.sq .in{width:100%;height:100%;border-radius:16px;background:#fff;border:2px solid #cfe5df;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:clamp(11px,1.15vw,18px);line-height:1.25;padding:4px}
+.sq .in .em{font-size:clamp(20px,2.6vw,40px);opacity:.35}
+.sq.station .in{color:#fff;border:none}
+.sq.station .in .em{opacity:1}
+.sq.locked .in{background:#d8dedc!important;color:#7a8583}
+.sq.done .in{opacity:.5}
+.sq.start .in{background:#fff4d6;border-color:#f2c46b}
+#token{position:absolute;width:clamp(34px,4vw,60px);height:clamp(34px,4vw,60px);border-radius:50%;background:var(--coral);border:5px solid #fff;transform:translate(-50%,-50%);transition:left .22s,top .22s;z-index:5;box-shadow:0 4px 10px rgba(0,0,0,.25)}
+#center{position:absolute;left:14.28%;top:20%;width:71.43%;height:60%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vh}
+#center h2{font-size:clamp(22px,3vw,46px);color:var(--teal-d);font-weight:600}
+#dice{width:clamp(80px,10vw,150px);height:clamp(80px,10vw,150px);background:#fff;border-radius:22px;border:5px solid var(--ink);font-size:clamp(48px,6.5vw,100px);font-weight:600;display:flex;align-items:center;justify-content:center}
+#dice.roll{animation:wob .14s infinite}
+@keyframes wob{0%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}100%{transform:rotate(-12deg)}}
+#progress{font-size:clamp(14px,1.6vw,24px);color:var(--muted)}
+#station{justify-content:flex-start;padding-top:2vh}
+.sthead{width:100%;display:flex;align-items:center;gap:2vw;font-size:clamp(18px,2vw,32px);font-weight:500}
+.sthead .nm{color:var(--teal-d)}
+.timebar{flex:1;height:20px;background:#d5e6e2;border-radius:10px;overflow:hidden}
+.timebar i{display:block;height:100%;width:100%;background:var(--teal);transition:width .1s linear}
+#stbody{position:relative;flex:1;width:100%}
+.drop{transition:background .15s,border-color .15s}
+.drop.over{border-color:var(--coral)!important;background:#fff1ea!important}
+.pz{margin:2vh auto 0;width:min(70vw,900px);min-height:27vh;background:#fff;border:5px dashed #9fd3c7;border-radius:28px;display:flex;align-items:center;gap:2vw;padding:2vh 2.5vw}
+.pz .em{font-size:clamp(60px,9vw,130px)}
+.pz small{display:block;font-size:clamp(14px,1.5vw,22px);color:var(--muted)}
+.pz .txt{font-size:clamp(20px,2.6vw,40px);font-weight:500;line-height:1.3}
+.pz.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-14px)}75%{transform:translateX(14px)}}
+.tray{position:absolute;bottom:2vh;left:0;right:0;display:flex;justify-content:center;gap:1.3vw}
+.card{width:clamp(100px,13vw,200px);min-height:clamp(110px,15vw,220px);background:#fff;border-radius:22px;border:3px solid #cfe5df;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:clamp(13px,1.35vw,22px);line-height:1.25;padding:10px;cursor:grab;transition:transform .25s,border-color .15s;position:relative}
+.card .em{font-size:clamp(40px,5vw,76px)}
+.card.hover{border-color:var(--teal)}
+.card.dragging{transition:none;z-index:100;border-color:var(--coral);box-shadow:0 12px 30px rgba(0,0,0,.22);cursor:grabbing}
+.item{position:absolute;left:50%;top:2vh;width:50vw;margin-left:-25vw;min-height:24vh;align-items:flex-start;justify-content:center;text-align:left;padding:2vh 2vw;gap:1vh;font-size:clamp(18px,2.2vw,34px)}
+.item .from{font-size:clamp(13px,1.3vw,20px);color:var(--muted)}
+.item .em{font-size:clamp(34px,4vw,60px)}
+.item.pop{animation:pop .3s}
+@keyframes pop{from{opacity:0;margin-top:-30px}to{opacity:1;margin-top:0}}
+.bins{position:absolute;bottom:2vh;left:3vw;right:3vw;display:flex;justify-content:space-between}
+.bin{width:38vw;height:31vh;border-radius:28px;border:5px dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:clamp(20px,2.4vw,38px);font-weight:500;text-align:center}
+.bin .em{font-size:clamp(46px,6vw,90px)}
+.bin.safe{border-color:#7cc79a;background:#eaf7ef;color:#1e6b3e}
+.bin.danger{border-color:#e89a9a;background:#fcebeb;color:#8f2a2a}
+#fb{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%) scale(.8);max-width:80vw;padding:1.4vh 2.4vw;border-radius:24px;font-size:clamp(18px,2.2vw,34px);font-weight:500;text-align:center;color:#fff;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:150}
+#fb.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#fb.good{background:var(--green)}#fb.bad{background:var(--red)}
+.overlay{position:absolute;inset:0;background:rgba(238,247,245,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.4vh;z-index:200;text-align:center;padding:0 6vw}
+.overlay .big{font-size:clamp(60px,9vw,140px)}
+.overlay h2{font-size:clamp(28px,4vw,60px);color:var(--teal-d)}
+.overlay p{font-size:clamp(16px,2vw,30px);color:var(--muted);max-width:900px}
+.tag{display:inline-block;background:#d9f2ec;color:var(--teal-d);border-radius:999px;padding:.2em 1em;font-size:clamp(14px,1.6vw,24px)}
+#summary .wrap{display:flex;gap:4vw;align-items:center}
+.career{background:#fff;border-radius:28px;border:3px solid #cfe5df;padding:3vh 3vw;max-width:56vw;text-align:center;display:flex;flex-direction:column;gap:1.4vh;align-items:center}
+.career .em{font-size:clamp(60px,8vw,120px)}
+.career h2{font-size:clamp(24px,3.2vw,50px);color:var(--teal-d)}
+.career p{font-size:clamp(15px,1.7vw,26px);color:var(--muted)}
+.scoreList{font-size:clamp(14px,1.5vw,22px);color:var(--ink)}
+.qrbox{background:#fff;border-radius:24px;padding:2vh 2vw;text-align:center;font-size:clamp(14px,1.5vw,22px);display:flex;flex-direction:column;align-items:center;gap:1vh}
+#total{font-size:clamp(40px,6vw,90px);font-weight:600;color:var(--coral)}
+</style>
+</head>
+<body>
+
+<video id="cam" playsinline muted></video>
+<div id="cursor"></div>
+<div id="handPill">ไม่เห็นมือ</div>
+
+<section id="start" class="screen active">
+  <h1>เส้นทางนักเทคโนโลยีสุขภาพ</h1>
+  <p class="sub" id="progName"></p>
+  <div class="howto">
+    <div><b>🤏</b>จีบนิ้วโป้งกับนิ้วชี้<br>= หยิบ / กดปุ่ม</div>
+    <div><b>✋</b>แยกนิ้วออก<br>= วาง</div>
+    <div><b>🎲</b>ทอยเต๋า เดินไป<br>ผ่านภารกิจแต่ละสถานี</div>
+  </div>
+  <div class="row" id="startBtns">
+    <button class="btn primary" id="btnCam">🖐️ เล่นด้วยมือ (เปิดกล้อง)</button>
+    <button class="btn" id="btnMouse">🖱️ เล่นด้วยเมาส์ / แตะจอ</button>
+  </div>
+  <div class="row" id="readyBtns" style="display:none">
+    <button class="btn primary" id="btnGo">เริ่มเกม</button>
+  </div>
+  <div id="status"></div>
+</section>
+
+<section id="boardScreen" class="screen">
+  <div id="board">
+    <div id="center">
+      <h2>ทอยเต๋าเลย!</h2>
+      <div id="dice">?</div>
+      <button class="btn primary" id="btnRoll">🎲 ทอยลูกเต๋า</button>
+      <div id="progress"></div>
+    </div>
+    <div id="token"></div>
+  </div>
+</section>
+
+<section id="station" class="screen">
+  <div class="sthead">
+    <span class="nm" id="stName"></span>
+    <div class="timebar"><i id="timeFill"></i></div>
+    <span id="stTime">40</span>
+    <span>คะแนน <span id="stScore">0</span></span>
+  </div>
+  <div id="stbody"></div>
+  <div id="fb"></div>
+</section>
+
+<section id="summary" class="screen">
+  <div class="sub">คะแนนรวมของคุณ</div>
+  <div id="total">0</div>
+  <div class="wrap">
+    <div class="career" id="careerCard"></div>
+    <div class="qrbox">
+      <div id="qr"></div>
+      <div>สนใจเรียนสายนี้?<br>สแกนดูหลักสูตรเลย</div>
+    </div>
+  </div>
+  <div class="row">
+    <button class="btn primary" id="btnAgain">เล่นใหม่</button>
+  </div>
+  <div class="sub" id="resetIn" style="font-size:clamp(13px,1.3vw,18px)"></div>
+</section>
+
+<script>
+/* ===== ตั้งค่า (แก้ได้) ===== */
+const CONFIG = {
+  programName: 'หลักสูตรเทคโนโลยีสุขภาพ',
+  faculty: 'คณะวิทยาศาสตร์และเทคโนโลยี',
+  university: 'มหาวิทยาลัยราชภัฏบ้านสมเด็จเจ้าพระยา',
+  applyUrl: 'https://www.bsru.ac.th/',   // ลิงก์หน้าหลักสูตร / รับสมัคร ที่จะขึ้นเป็น QR
+  stationsPerGame: 3,                     // จำนวนสถานีต่อเกม
+  stationTime: 40,                        // วินาทีต่อสถานี
+  idleReset: 30                           // วินาทีที่หน้าสรุปก่อนกลับหน้าแรก
+};
+
+/* ===== สถานีบนกระดาน ===== */
+const STATIONS = [
+  {id:'device', sq:2,  name:'ห้องเครื่องมือแพทย์', subject:'วิชาเครื่องมือแพทย์', icon:'🩺', color:'#0f8a74', ready:true,
+   how:'ผู้ป่วยมาพร้อมอาการ หยิบเครื่องมือแพทย์ที่เหมาะสมไปวางที่ผู้ป่วย',
+   career:'สายผู้เชี่ยวชาญเครื่องมือแพทย์', careerDesc:'คุณเลือกเครื่องมือได้แม่นยำ เหมาะกับงานดูแลและบริหารเครื่องมือแพทย์ในโรงพยาบาลหรือบริษัทเครื่องมือแพทย์'},
+  {id:'repair', sq:6,  name:'ศูนย์ซ่อมบำรุง', subject:'การจัดการเครื่องมือแพทย์', icon:'🔧', color:'#d85a30', ready:false},
+  {id:'iot',    sq:10, name:'แล็บ IoT', subject:'อุปกรณ์สุขภาพอัจฉริยะ', icon:'📡', color:'#534ab7', ready:false},
+  {id:'data',   sq:14, name:'ห้องข้อมูลสุขภาพ', subject:'ระบบสารสนเทศสุขภาพ', icon:'📊', color:'#185fa5', ready:false},
+  {id:'cyber',  sq:18, name:'ป้อมไซเบอร์', subject:'วิชาความปลอดภัยในระบบคอมพิวเตอร์', icon:'🛡️', color:'#993556', ready:true,
+   how:'อีเมลและไฟล์เข้ามาในระบบโรงพยาบาล ลากของปลอดภัยไปถังซ้าย ของอันตรายไปถังขวา',
+   career:'สายผู้พิทักษ์ข้อมูลสุขภาพ', careerDesc:'คุณจับภัยไซเบอร์ได้ไว เหมาะกับงานดูแลระบบและความปลอดภัยข้อมูลผู้ป่วยในสถานพยาบาล'}
+];
+
+/* ===== ข้อมูลสถานี 1: เครื่องมือแพทย์ ===== */
+const DEVICES = {
+  lumbar:{n:'เครื่องดึงหลัง', e:'🛏️'},
+  cervical:{n:'เครื่องดึงคอ', e:'🧣'},
+  o2:{n:'เครื่องผลิตออกซิเจน', e:'🫁'},
+  ems:{n:'เครื่องกระตุ้นกล้ามเนื้อด้วยไฟฟ้า', e:'⚡'},
+  shock:{n:'เครื่องคลื่นกระแทก (Shockwave)', e:'💥'},
+  aed:{n:'เครื่องกระตุกหัวใจ AED', e:'❤️‍🩹'},
+  esu:{n:'เครื่องจี้ไฟฟ้าผ่าตัด', e:'🔥'},
+  pump:{n:'เครื่องให้สารละลาย', e:'💧'},
+  incubator:{n:'ตู้อบทารก', e:'👶'},
+  suction:{n:'เครื่องดูดเสมหะ', e:'🌀'}
+};
+const PATIENTS = [
+  {e:'🧓', t:'ปวดหลังส่วนเอวเรื้อรัง หมอนรองกระดูกกดทับเส้นประสาท', a:'lumbar', why:'เครื่องดึงหลังช่วยลดแรงกดที่หมอนรองกระดูกส่วนเอว'},
+  {e:'👨‍💻', t:'ปวดคอร้าวลงแขน จากกระดูกคอกดทับเส้นประสาท', a:'cervical', why:'เครื่องดึงคอช่วยขยายช่องกระดูกคอ ลดการกดทับ'},
+  {e:'👴', t:'หายใจเหนื่อย ออกซิเจนในเลือดต่ำ ต้องใช้ออกซิเจนที่บ้าน', a:'o2', why:'เครื่องผลิตออกซิเจนแยกออกซิเจนจากอากาศให้ผู้ป่วย'},
+  {e:'🧑‍🦽', t:'กล้ามเนื้อขาอ่อนแรงหลังผ่าตัด ต้องฟื้นฟู', a:'ems', why:'กระแสไฟฟ้าอ่อน ๆ ช่วยกระตุ้นให้กล้ามเนื้อหดตัว'},
+  {e:'🎾', t:'เอ็นข้อศอกอักเสบเรื้อรัง ปวดมาหลายเดือน', a:'shock', why:'คลื่นกระแทกกระตุ้นการซ่อมแซมเนื้อเยื่อเอ็น'},
+  {e:'🚨', t:'หมดสติกะทันหัน หัวใจเต้นผิดจังหวะรุนแรง', a:'aed', why:'AED วิเคราะห์จังหวะหัวใจและช็อกไฟฟ้าให้กลับมาเต้นปกติ'},
+  {e:'👩‍⚕️', t:'ศัลยแพทย์ต้องตัดเนื้อเยื่อพร้อมห้ามเลือดในห้องผ่าตัด', a:'esu', why:'เครื่องจี้ไฟฟ้าใช้ความร้อนตัดเนื้อเยื่อและห้ามเลือดได้พร้อมกัน'},
+  {e:'🤒', t:'ต้องให้ยาทางหลอดเลือดดำในอัตราที่แม่นยำ', a:'pump', why:'เครื่องให้สารละลายควบคุมอัตราการไหลของยาได้แม่นยำ'},
+  {e:'🍼', t:'ทารกคลอดก่อนกำหนด ควบคุมอุณหภูมิร่างกายเองไม่ได้', a:'incubator', why:'ตู้อบทารกควบคุมอุณหภูมิและความชื้นให้ทารก'},
+  {e:'😮‍💨', t:'ผู้ป่วยติดเตียงมีเสมหะอุดทางเดินหายใจ', a:'suction', why:'เครื่องดูดเสมหะสร้างแรงดูดเพื่อเปิดทางเดินหายใจ'}
+];
+
+/* ===== ข้อมูลสถานี 5: ไซเบอร์ ===== */
+const CYBER = [
+  {e:'📧', f:'จาก: lab@hospital.go.th', t:'ผลตรวจเลือดผู้ป่วยเตียง 5 พร้อมแล้วในระบบ HIS', s:true, why:'มาจากอีเมลทางการของโรงพยาบาล และให้ไปดูในระบบ'},
+  {e:'📧', f:'จาก: it-support@hospital.go.th', t:'แจ้งปิดปรับปรุงระบบคืนวันเสาร์ 22.00 น. ไม่ต้องกดลิงก์ใด ๆ', s:true, why:'เป็นประกาศจากฝ่าย IT ที่ไม่ขอข้อมูลหรือให้กดลิงก์'},
+  {e:'📅', f:'ระบบนัดหมาย', t:'นัดผู้ป่วยกายภาพบำบัด พรุ่งนี้ 09.00 น.', s:true, why:'ข้อมูลงานปกติจากระบบภายใน'},
+  {e:'💊', f:'ระบบเภสัชกรรม', t:'ใบสั่งยาใหม่รออนุมัติ 3 รายการ', s:true, why:'งานปกติในระบบที่ต้องล็อกอิน'},
+  {e:'🎁', f:'จาก: promo@free-gift.xyz', t:'ยินดีด้วย! คุณได้รับ iPhone ฟรี คลิกเพื่อรับรางวัล', s:false, why:'ของฟรีจากโดเมนแปลก ๆ คือฟิชชิงที่พบบ่อย'},
+  {e:'📎', f:'ไฟล์แนบ', t:'ผลตรวจผู้ป่วย.pdf.exe', s:false, why:'นามสกุล .exe คือโปรแกรม อาจเป็นมัลแวร์ปลอมเป็น PDF'},
+  {e:'⚠️', f:'จาก: security@hosp1tal-th.com', t:'ด่วน! ยืนยันรหัสผ่านภายใน 1 ชม. ไม่งั้นบัญชีถูกปิด', s:false, why:'โดเมนสะกดผิด (1 แทน i) และเร่งให้รีบทำ'},
+  {e:'💬', f:'LINE ส่วนตัว', t:'ขอเลขบัตรประชาชนและประวัติผู้ป่วยหน่อย ด่วน', s:false, why:'ข้อมูลผู้ป่วยได้รับการคุ้มครองตาม PDPA ห้ามส่งทางช่องทางส่วนตัว'},
+  {e:'💾', f:'พบในลานจอดรถ', t:'แฟลชไดรฟ์ไม่ทราบที่มา เขียนว่า "เงินเดือนพนักงาน"', s:false, why:'อุปกรณ์ไม่ทราบที่มาอาจฝังมัลแวร์ ห้ามเสียบเครื่อง'},
+  {e:'💸', f:'จาก: ceo.hospital@gmail.com', t:'ผู้อำนวยการขอให้โอนเงินด่วนไปบัญชีนี้ อย่าบอกใคร', s:false, why:'ปลอมเป็นผู้บริหารผ่านอีเมลส่วนตัว และขอให้ปิดเป็นความลับ'}
+];
+
+/* ===== ตัวช่วย ===== */
+const $ = id => document.getElementById(id);
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.id===id)); }
+$('progName').textContent = `${CONFIG.programName} ${CONFIG.faculty} ${CONFIG.university}`;
+
+/* ===== ระบบลากวาง (ใช้ร่วมกันทั้งมือและเมาส์) ===== */
+let drag = null, onDrop = null;
+function pointerDown(x,y,src){
+  const el = document.elementFromPoint(x,y); if(!el) return;
+  const d = el.closest('[data-drag]');
+  if(d && onDrop){ drag = {el:d, sx:x, sy:y}; d.classList.add('dragging'); return; }
+  if(src==='hand'){ const b = el.closest('.btn'); if(b && b.offsetParent) b.click(); }
+}
+function zoneAt(el){
+  const r = el.getBoundingClientRect(), cx = r.left+r.width/2, cy = r.top+r.height/2;
+  for(const z of document.querySelectorAll('.screen.active .drop')){
+    const q = z.getBoundingClientRect();
+    if(cx>=q.left && cx<=q.right && cy>=q.top && cy<=q.bottom) return z;
+  }
+  return null;
+}
+function pointerMove(x,y){
+  if(!drag) return;
+  drag.el.style.transform = `translate(${x-drag.sx}px,${y-drag.sy}px) scale(1.06)`;
+  const z = zoneAt(drag.el);
+  document.querySelectorAll('.drop').forEach(d=>d.classList.toggle('over', d===z));
+}
+function pointerUp(){
+  if(!drag) return;
+  const el = drag.el; drag = null; el.classList.remove('dragging');
+  const z = zoneAt(el);
+  document.querySelectorAll('.drop').forEach(d=>d.classList.remove('over'));
+  const used = (z && onDrop) ? onDrop(el,z) : false;
+  if(!used) el.style.transform = '';
+}
+function cancelDrag(){ if(drag){ drag.el.classList.remove('dragging'); drag.el.style.transform=''; drag=null; } }
+
+window.addEventListener('pointerdown', e=>pointerDown(e.clientX,e.clientY,'mouse'));
+window.addEventListener('pointermove', e=>pointerMove(e.clientX,e.clientY));
+window.addEventListener('pointerup', ()=>pointerUp());
+window.addEventListener('keydown', e=>{ if(e.key==='Escape') resetToStart(); });
+
+/* ===== ระบบจับมือด้วยเว็บแคม (MediaPipe) ===== */
+const video = $('cam'), cursor = $('cursor'), pill = $('handPill');
+let landmarker = null, camReady = false;
+async function startCamera(){
+  $('status').textContent = 'กำลังโหลดระบบจับมือ… (ครั้งแรกอาจใช้เวลาสักครู่)';
+  $('btnCam').disabled = true;
+  try{
+    const V = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+    const {HandLandmarker, FilesetResolver} = await import(V);
+    const fs = await FilesetResolver.forVisionTasks(V + '/wasm');
+    const opts = d => ({baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task', delegate:d}, runningMode:'VIDEO', numHands:1});
+    try{ landmarker = await HandLandmarker.createFromOptions(fs, opts('GPU')); }
+    catch(e){ landmarker = await HandLandmarker.createFromOptions(fs, opts('CPU')); }
+    $('status').textContent = 'กรุณากดอนุญาตให้ใช้กล้อง';
+    const stream = await navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'}});
+    video.srcObject = stream; await video.play();
+    video.style.display = 'block'; pill.style.display = 'block';
+    camReady = true;
+    $('status').textContent = 'พร้อมแล้ว! ยกมือให้เห็นวงกลมสีส้ม แล้วจีบนิ้วที่ปุ่ม "เริ่มเกม"';
+    $('startBtns').style.display = 'none'; $('readyBtns').style.display = 'flex';
+    requestAnimationFrame(handLoop);
+  }catch(err){
+    console.error(err);
+    $('btnCam').disabled = false;
+    $('status').textContent = 'เปิดกล้องไม่สำเร็จ (ต้องเปิดผ่าน https และอนุญาตกล้อง) ลองเล่นด้วยเมาส์ได้เลย';
+  }
+}
+let lastT = -1, sm = {x:innerWidth/2, y:innerHeight/2}, pinched = false, lostAt = 0, hoverEl = null;
+const dist = (a,b) => Math.hypot(a.x-b.x, a.y-b.y);
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+function handLoop(){
+  if(video.readyState >= 2 && video.currentTime !== lastT){
+    lastT = video.currentTime;
+    const res = landmarker.detectForVideo(video, performance.now());
+    if(res.landmarks && res.landmarks.length){
+      const lm = res.landmarks[0];
+      const mx = (lm[4].x + lm[8].x)/2, my = (lm[4].y + lm[8].y)/2;
+      const tx = clamp((1 - mx - 0.15)/0.7, 0, 1) * innerWidth;
+      const ty = clamp((my - 0.12)/0.6, 0, 1) * innerHeight;
+      sm.x += (tx - sm.x)*0.45; sm.y += (ty - sm.y)*0.45;
+      cursor.style.display = 'block';
+      cursor.style.left = sm.x + 'px'; cursor.style.top = sm.y + 'px';
+      pill.textContent = '✋ เห็นมือแล้ว';
+      const d = dist(lm[4], lm[8]) / (dist(lm[0], lm[9]) || 1);
+      if(!pinched && d < 0.33){ pinched = true; cursor.classList.add('pinch'); pointerDown(sm.x, sm.y, 'hand'); }
+      else if(pinched && d > 0.5){ pinched = false; cursor.classList.remove('pinch'); pointerUp(); }
+      pointerMove(sm.x, sm.y);
+      updateHover(sm.x, sm.y);
+      lostAt = 0;
+    }else{
+      if(!lostAt) lostAt = performance.now();
+      else if(performance.now() - lostAt > 400){
+        if(pinched){ pinched = false; cursor.classList.remove('pinch'); pointerUp(); }
+        cursor.style.display = 'none'; pill.textContent = 'ไม่เห็นมือ'; updateHover(-1,-1);
+      }
+    }
+  }
+  requestAnimationFrame(handLoop);
+}
+function updateHover(x,y){
+  const el = x < 0 ? null : document.elementFromPoint(x,y);
+  const h = el ? el.closest('.btn,[data-drag]') : null;
+  if(h !== hoverEl){ if(hoverEl) hoverEl.classList.remove('hover'); hoverEl = h; if(h) h.classList.add('hover'); }
+}
+
+/* ===== กระดาน ===== */
+const board = $('board'), token = $('token');
+function sqPos(i){
+  if(i < 7) return {c:i, r:0};
+  if(i < 10) return {c:6, r:i-6};
+  if(i < 17) return {c:6-(i-10), r:4};
+  return {c:0, r:4-(i-16)};
+}
+const DECO = ['❤️','💊','🩻','🧬','🩹','🌡️'];
+function buildBoard(){
+  board.querySelectorAll('.sq').forEach(s=>s.remove());
+  for(let i=0;i<20;i++){
+    const {c,r} = sqPos(i), st = STATIONS.find(s=>s.sq===i);
+    const d = document.createElement('div');
+    d.className = 'sq'; d.id = 'sq'+i;
+    Object.assign(d.style, {left:(c/7*100)+'%', top:(r/5*100)+'%', width:(100/7)+'%', height:'20%'});
+    if(i===0){ d.classList.add('start'); d.innerHTML = '<div class="in"><span class="em" style="opacity:1">🏁</span>เริ่ม</div>'; }
+    else if(st){
+      d.classList.add('station'); if(!st.ready) d.classList.add('locked');
+      d.innerHTML = `<div class="in" style="background:${st.color}"><span class="em">${st.icon}</span>${st.name}${st.ready?'':'<br><small>เร็ว ๆ นี้</small>'}</div>`;
+    } else d.innerHTML = `<div class="in"><span class="em">${DECO[i%DECO.length]}</span></div>`;
+    board.appendChild(d);
+  }
+}
+function placeToken(i){ const {c,r} = sqPos(i); token.style.left = ((c+.5)/7*100)+'%'; token.style.top = ((r+.5)/5*100)+'%'; }
+
+/* ===== สถานะเกม ===== */
+let G = null, rolling = false;
+const readyStations = () => STATIONS.filter(s=>s.ready);
+function newGame(){
+  const target = Math.min(CONFIG.stationsPerGame, readyStations().length);
+  G = {pos:0, played:[], scores:{}, total:0, target};
+  buildBoard(); placeToken(0);
+  $('dice').textContent = '?';
+  $('btnRoll').style.display = '';
+  updateProgress();
+  show('boardScreen');
+}
+function updateProgress(){
+  $('progress').textContent = `ผ่านภารกิจแล้ว ${G.played.length}/${G.target} สถานี · คะแนน ${G.total}`;
+  G.played.forEach(id=>{ const s = STATIONS.find(x=>x.id===id); $('sq'+s.sq).classList.add('done'); });
+}
+async function roll(){
+  if(rolling) return; rolling = true;
+  $('btnRoll').style.display = 'none';
+  const dice = $('dice'); dice.classList.add('roll');
+  for(let k=0;k<12;k++){ dice.textContent = 1+Math.floor(Math.random()*6); await sleep(70); }
+  dice.classList.remove('roll');
+  const n = 1+Math.floor(Math.random()*6); dice.textContent = n;
+  await sleep(400);
+  for(let k=0;k<n;k++){ G.pos = (G.pos+1)%20; placeToken(G.pos); await sleep(260); }
+  const isTarget = p => STATIONS.some(s=>s.sq===p && s.ready && !G.played.includes(s.id));
+  while(!isTarget(G.pos)){ G.pos = (G.pos+1)%20; placeToken(G.pos); await sleep(180); }
+  await sleep(500);
+  rolling = false;
+  openStation(STATIONS.find(s=>s.sq===G.pos));
+}
+
+/* ===== สถานี (โครงร่วม) ===== */
+let cur = null, timerId = null, timeLeft = 0, stScore = 0, locked = false;
+const body = $('stbody');
+function openStation(st){
+  cur = st; stScore = 0; onDrop = null;
+  $('stName').textContent = `${st.icon} ${st.name}`;
+  $('stScore').textContent = 0; $('stTime').textContent = CONFIG.stationTime; $('timeFill').style.width = '100%';
+  body.innerHTML = `<div class="overlay"><div class="big">${st.icon}</div><span class="tag">${st.subject}</span><h2>${st.name}</h2><p>${st.how}</p><p>มีเวลา ${CONFIG.stationTime} วินาที</p><button class="btn primary" id="btnStart">เริ่มภารกิจ</button></div>`;
+  show('station');
+  $('btnStart').onclick = runStation;
+}
+function runStation(){
+  body.innerHTML = ''; locked = false;
+  timeLeft = CONFIG.stationTime;
+  IMPL[cur.id].start();
+  const t0 = performance.now();
+  timerId = setInterval(()=>{
+    timeLeft = CONFIG.stationTime - (performance.now()-t0)/1000;
+    $('timeFill').style.width = Math.max(0, timeLeft/CONFIG.stationTime*100) + '%';
+    $('stTime').textContent = Math.max(0, Math.ceil(timeLeft));
+    if(timeLeft <= 0) endStation();
+  }, 100);
+}
+function addScore(n){ stScore += n; $('stScore').textContent = stScore; }
+let fbTimer = null;
+function feedback(text, good, ms=1300){
+  const fb = $('fb'); fb.textContent = text; fb.className = good ? 'good show' : 'bad show';
+  clearTimeout(fbTimer); fbTimer = setTimeout(()=>fb.className='', ms);
+}
+function endStation(){
+  clearInterval(timerId); timerId = null; onDrop = null; cancelDrag();
+  $('fb').className = '';
+  G.scores[cur.id] = stScore; G.total += stScore; G.played.push(cur.id);
+  const last = G.played.length >= G.target;
+  body.innerHTML = `<div class="overlay"><div class="big">⏱️</div><h2>หมดเวลา!</h2><p>สถานี${cur.name} ได้ <b style="color:var(--coral)">${stScore}</b> คะแนน</p><button class="btn primary" id="btnNext">${last?'ดูผลของฉัน':'กลับไปทอยเต๋า'}</button></div>`;
+  $('btnNext').onclick = () => { if(last) showSummary(); else { updateProgress(); $('btnRoll').style.display=''; show('boardScreen'); } };
+}
+
+/* ===== การทำงานของแต่ละสถานี ===== */
+const IMPL = {
+  device:{
+    start(){
+      body.innerHTML = `<div class="pz drop" id="pz"><div class="em" id="pzE"></div><div><small>อาการผู้ป่วย</small><div class="txt" id="pzT"></div></div></div><div class="tray" id="tray"></div>`;
+      this.queue = shuffle(PATIENTS); this.next();
+      onDrop = (el,z) => {
+        if(locked || z.id!=='pz') return false;
+        if(el.dataset.id === this.p.a){
+          locked = true; el.style.visibility = 'hidden';
+          addScore(100); feedback('✔ ถูกต้อง +100 · ' + this.p.why, true, 1600);
+          setTimeout(()=>{ locked = false; if(timerId) this.next(); }, 1600);
+          return true;
+        }
+        $('pz').classList.remove('shake'); void $('pz').offsetWidth; $('pz').classList.add('shake');
+        feedback('ยังไม่ใช่ ลองเครื่องอื่นดูนะ', false, 900);
+        return false;
+      };
+    },
+    next(){
+      if(!this.queue.length) this.queue = shuffle(PATIENTS);
+      this.p = this.queue.pop();
+      $('pzE').textContent = this.p.e; $('pzT').textContent = this.p.t;
+      const others = shuffle(Object.keys(DEVICES).filter(k=>k!==this.p.a)).slice(0,5);
+      $('tray').innerHTML = shuffle([this.p.a, ...others]).map(k=>`<div class="card" data-drag data-id="${k}"><span class="em">${DEVICES[k].e}</span>${DEVICES[k].n}</div>`).join('');
+    }
+  },
+  cyber:{
+    start(){
+      body.innerHTML = `<div class="bins"><div class="bin safe drop" data-bin="safe"><span class="em">✅</span>ปลอดภัย<br>เก็บเข้าระบบ</div><div class="bin danger drop" data-bin="danger"><span class="em">🚫</span>อันตราย<br>ลบทิ้ง / แจ้ง IT</div></div>`;
+      this.queue = shuffle(CYBER); this.next();
+      onDrop = (el,z) => {
+        if(locked || !z.dataset.bin) return false;
+        const right = (z.dataset.bin === 'safe') === this.it.s;
+        locked = true; el.remove();
+        if(right){ addScore(50); feedback('✔ ถูกต้อง +50 · ' + this.it.why, true, 1700); }
+        else feedback('✖ ผิดถัง · ' + this.it.why, false, 2200);
+        setTimeout(()=>{ locked = false; if(timerId) this.next(); }, right ? 1700 : 2200);
+        return true;
+      };
+    },
+    next(){
+      if(!this.queue.length) this.queue = shuffle(CYBER);
+      this.it = this.queue.pop();
+      const d = document.createElement('div');
+      d.className = 'card item pop'; d.setAttribute('data-drag','');
+      d.innerHTML = `<span class="em">${this.it.e}</span><span class="from">${this.it.f}</span><span>${this.it.t}</span>`;
+      body.appendChild(d);
+    }
+  }
+};
+
+/* ===== หน้าสรุป ===== */
+let resetTimer = null;
+function showSummary(){
+  $('total').textContent = G.total;
+  let best = null;
+  G.played.forEach(id=>{ if(!best || G.scores[id] > G.scores[best]) best = id; });
+  const st = STATIONS.find(s=>s.id===best);
+  const list = G.played.map(id=>{ const s = STATIONS.find(x=>x.id===id); return `${s.icon} ${s.name}: ${G.scores[id]}`; }).join('<br>');
+  $('careerCard').innerHTML = `<div class="sub">คุณเหมาะกับ…</div><div class="em">${st.icon}</div><h2>${st.career}</h2><p>${st.careerDesc}</p><div class="scoreList">${list}</div><span class="tag">เรียนได้ที่ ${CONFIG.programName}</span>`;
+  const qr = $('qr'); qr.innerHTML = '';
+  if(window.QRCode) new QRCode(qr, {text:CONFIG.applyUrl, width:200, height:200});
+  else qr.textContent = CONFIG.applyUrl;
+  show('summary');
+  let left = CONFIG.idleReset;
+  $('resetIn').textContent = `กลับหน้าแรกอัตโนมัติใน ${left} วินาที`;
+  clearInterval(resetTimer);
+  resetTimer = setInterval(()=>{ left--; $('resetIn').textContent = `กลับหน้าแรกอัตโนมัติใน ${left} วินาที`; if(left<=0) resetToStart(); }, 1000);
+}
+function resetToStart(){
+  clearInterval(resetTimer); clearInterval(timerId); timerId = null; onDrop = null; cancelDrag(); rolling = false;
+  show('start');
+}
+
+/* ===== ปุ่ม ===== */
+$('btnCam').onclick = startCamera;
+$('btnMouse').onclick = newGame;
+$('btnGo').onclick = newGame;
+$('btnRoll').onclick = roll;
+$('btnAgain').onclick = () => { clearInterval(resetTimer); newGame(); };
+</script>
+</body>
+</html>
