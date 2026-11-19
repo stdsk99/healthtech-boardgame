@@ -99,6 +99,26 @@ h1{font-size:clamp(28px,8vmin,80px);font-weight:600;color:var(--teal-d);text-ali
 .scoreList{font-size:clamp(12px,2.4vmin,22px);color:var(--ink)}
 .qrbox{background:#fff;border-radius:4vmin;padding:2vmin 3vmin;text-align:center;font-size:clamp(12px,2.4vmin,22px);display:flex;flex-direction:column;align-items:center;gap:1vmin}
 #total{font-size:clamp(36px,10vmin,90px);font-weight:600;color:var(--coral);line-height:1.1}
+.card.fix .em{font-size:calc(var(--cw)*.26)}
+.card.fix{font-size:clamp(11px,calc(var(--cw)*.1),21px)}
+@media (orientation:portrait){.tray.t4{max-width:calc(var(--cw)*2 + 3vmin)}}
+.iotbox{flex-direction:column;align-items:stretch;gap:2vmin}
+.iothead{font-size:clamp(15px,3.4vmin,32px);font-weight:500;text-align:center}
+.pipe{display:flex;align-items:center;justify-content:center;gap:1vmin;flex-wrap:wrap}
+.slot{width:clamp(70px,17vmin,160px);min-height:clamp(70px,15vmin,140px);border:3px dashed #b9c9c5;border-radius:2vmin;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:clamp(11px,2.2vmin,20px);color:var(--muted);padding:4px;line-height:1.2}
+.slot small{font-size:.85em}
+.slot.active{border-color:#534ab7;background:#eeedfe;color:#3c3489}
+.slot.filled{border-style:solid;border-color:#5dcaa5;background:#e1f5ee;color:#085041}
+.slot .em{font-size:clamp(22px,5vmin,48px)}
+.arrow{font-size:clamp(14px,3vmin,28px);color:var(--muted)}
+@media (orientation:portrait){.arrow{display:none}.pipe{display:grid;grid-template-columns:repeat(2,auto);justify-content:center}}
+.bins.three{gap:2vmin}
+.bin.folder{border-color:#85b7eb;background:#e6f1fb;color:#0c447c;font-size:clamp(13px,3vmin,32px)}
+.dash{background:#fff;border-radius:3vmin;border:2px solid #cfe5df;padding:2vmin 3vmin;width:min(92vw,900px)}
+.dtitle{font-weight:500;color:var(--teal-d);font-size:clamp(14px,2.8vmin,26px);margin-bottom:1vmin}
+.dcols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2vmin;text-align:left}
+.dcol{display:flex;flex-direction:column;gap:.5vmin;font-size:clamp(11px,2vmin,18px);color:var(--ink)}
+.dcol b{font-weight:500;color:#0c447c}
 </style>
 </head>
 <body>
@@ -181,9 +201,15 @@ const STATIONS = [
   {id:'device', sq:2,  name:'ห้องเครื่องมือแพทย์', subject:'วิชาเครื่องมือแพทย์', icon:'🩺', color:'#0f8a74', ready:true,
    how:'ผู้ป่วยมาพร้อมอาการ หยิบเครื่องมือแพทย์ที่เหมาะสมไปวางที่ผู้ป่วย',
    career:'สายผู้เชี่ยวชาญเครื่องมือแพทย์', careerDesc:'คุณเลือกเครื่องมือได้แม่นยำ เหมาะกับงานดูแลและบริหารเครื่องมือแพทย์ในโรงพยาบาลหรือบริษัทเครื่องมือแพทย์'},
-  {id:'repair', sq:6,  name:'ศูนย์ซ่อมบำรุง', subject:'การจัดการเครื่องมือแพทย์', icon:'🔧', color:'#d85a30', ready:false},
-  {id:'iot',    sq:10, name:'แล็บ IoT', subject:'อุปกรณ์สุขภาพอัจฉริยะ', icon:'📡', color:'#534ab7', ready:false},
-  {id:'data',   sq:14, name:'ห้องข้อมูลสุขภาพ', subject:'ระบบสารสนเทศสุขภาพ', icon:'📊', color:'#185fa5', ready:false},
+  {id:'repair', sq:6,  name:'ศูนย์ซ่อมบำรุง', subject:'การจัดการเครื่องมือแพทย์', icon:'🔧', color:'#d85a30', ready:true,
+   how:'เครื่องมือแพทย์ขึ้นแจ้งเตือน หยิบวิธีแก้ที่ถูกต้องไปวางที่เครื่อง',
+   career:'สายช่างเทคนิคเครื่องมือแพทย์', careerDesc:'คุณวิเคราะห์อาการเสียได้ดี เหมาะกับงานซ่อมบำรุงและตรวจความพร้อมของเครื่องมือแพทย์ในโรงพยาบาล'},
+  {id:'iot',    sq:10, name:'แล็บ IoT', subject:'อุปกรณ์สุขภาพอัจฉริยะ (IoT)', icon:'📡', color:'#534ab7', ready:true,
+   how:'ต่อวงจรอุปกรณ์สุขภาพอัจฉริยะทีละขั้น เซนเซอร์ → สมองกล → คลาวด์ → แจ้งเตือน',
+   career:'สายนักพัฒนา IoT สุขภาพ', careerDesc:'คุณต่อระบบได้เป็นขั้นตอน เหมาะกับงานสร้างอุปกรณ์สุขภาพอัจฉริยะและระบบติดตามผู้ป่วยทางไกล'},
+  {id:'data',   sq:14, name:'ห้องข้อมูลสุขภาพ', subject:'ระบบสารสนเทศสุขภาพ', icon:'📊', color:'#185fa5', ready:true,
+   how:'ข้อมูลผู้ป่วยไหลเข้ามา ลากไปเก็บให้ถูกแฟ้ม: สัญญาณชีพ / ประวัติสุขภาพ / นัดหมาย',
+   career:'สายนักจัดการข้อมูลสุขภาพ', careerDesc:'คุณจัดระเบียบข้อมูลได้แม่นยำ เหมาะกับงานระบบสารสนเทศและข้อมูลสุขภาพในสถานพยาบาล'},
   {id:'cyber',  sq:18, name:'ป้อมไซเบอร์', subject:'วิชาความปลอดภัยในระบบคอมพิวเตอร์', icon:'🛡️', color:'#993556', ready:true,
    how:'อีเมลและไฟล์เข้ามาในระบบโรงพยาบาล ลากของปลอดภัยไปถังซ้าย ของอันตรายไปถังขวา',
    career:'สายผู้พิทักษ์ข้อมูลสุขภาพ', careerDesc:'คุณจับภัยไซเบอร์ได้ไว เหมาะกับงานดูแลระบบและความปลอดภัยข้อมูลผู้ป่วยในสถานพยาบาล'}
@@ -216,6 +242,49 @@ const PATIENTS = [
 ];
 
 /* ===== ข้อมูลสถานี 5: ไซเบอร์ ===== */
+/* ===== ข้อมูลสถานี 2: ศูนย์ซ่อมบำรุง ===== */
+const REPAIRS = [
+  {e:'💧', d:'เครื่องให้สารละลาย', t:'แจ้งเตือน Occlusion (การไหลถูกอุดกั้น)', a:'ตรวจสายน้ำเกลือพับ หรือแคลมป์ปิดอยู่', why:'สายพับหรือแคลมป์ปิดทำให้แรงดันในสายสูง เครื่องจึงเตือน'},
+  {e:'💧', d:'เครื่องให้สารละลาย', t:'แจ้งเตือน Air-in-line (มีฟองอากาศในสาย)', a:'ไล่ฟองอากาศออกจากสาย แล้วเริ่มใหม่', why:'ฟองอากาศเข้าหลอดเลือดอันตราย เครื่องจึงหยุดและเตือน'},
+  {e:'👶', d:'ตู้อบทารก', t:'อุณหภูมิในตู้ไม่ขึ้นถึงค่าที่ตั้งไว้', a:'ตรวจฮีตเตอร์และพัดลมหมุนเวียนอากาศ', why:'ฮีตเตอร์และพัดลมคือหัวใจของการคุมอุณหภูมิในตู้'},
+  {e:'🫁', d:'เครื่องผลิตออกซิเจน', t:'ความเข้มข้นออกซิเจนต่ำกว่าปกติ', a:'ทำความสะอาด / เปลี่ยนแผ่นกรองอากาศเข้า', why:'แผ่นกรองอุดตันทำให้อากาศเข้าไม่พอ ออกซิเจนจึงต่ำ'},
+  {e:'🫁', d:'เครื่องผลิตออกซิเจน', t:'เปิดสวิตช์แล้วเครื่องไม่ทำงาน ไฟไม่ติด', a:'ตรวจปลั๊ก ฟิวส์ และสายไฟ', why:'เริ่มจากสิ่งง่ายที่สุดก่อนเสมอ คือแหล่งจ่ายไฟ'},
+  {e:'🌀', d:'เครื่องดูดเสมหะ', t:'แรงดูดอ่อนผิดปกติ', a:'ตรวจขวดรองรับเต็ม หรือสายและฝาขวดรั่ว', why:'ขวดเต็มหรือจุดรั่วทำให้สูญเสียแรงดูด'},
+  {e:'❤️‍🩹', d:'เครื่อง AED', t:'ไฟสถานะเป็นสีแดง เครื่องไม่พร้อมใช้', a:'เปลี่ยนแบตเตอรี่ หรือแผ่นอิเล็กโทรดที่หมดอายุ', why:'AED ตรวจตัวเองทุกวัน ไฟแดงมักหมายถึงแบตหรือแผ่นหมดอายุ'},
+  {e:'🩺', d:'เครื่องวัดความดันอัตโนมัติ', t:'วัดค่าไม่ขึ้น ผ้าพันแขนพองไม่เต็ม', a:'ตรวจรอยรั่วของผ้าพันแขนและสายลม', why:'ลมรั่วทำให้สร้างแรงดันไม่ได้ จึงวัดค่าไม่ได้'}
+];
+
+/* ===== ข้อมูลสถานี 3: แล็บ IoT ===== */
+const IOT_SLOTS = ['เซนเซอร์','สมองกล','คลาวด์','แจ้งเตือน'];
+const IOT_PROJECTS = [
+  {name:'ไม้เท้าอัจฉริยะ แจ้งเตือนผู้สูงอายุหกล้ม', e:'🦯',
+   parts:[{e:'🧭',n:'เซนเซอร์วัดความเร่ง (IMU)'},{e:'🔌',n:'ESP32 (มี WiFi)'},{e:'📈',n:'Google Sheets'},{e:'💬',n:'LINE แจ้งเตือนลูกหลาน'}],
+   done:'👵 คุณยายหกล้ม → 📱 ลูกได้รับแจ้งเตือนทาง LINE ทันที!'},
+  {name:'เครื่องวัดฝุ่น PM2.5 ในห้องเรียน', e:'🌫️',
+   parts:[{e:'🌫️',n:'เซนเซอร์ฝุ่น PM2.5'},{e:'🔌',n:'ESP32 (มี WiFi)'},{e:'📈',n:'Google Sheets'},{e:'📊',n:'แดชบอร์ดเว็บ + ไฟเตือนสี'}],
+   done:'😷 ฝุ่นเกินมาตรฐาน → 🔴 ไฟแดงขึ้น ครูสั่งปิดหน้าต่างทันที!'},
+  {name:'แผ่นรองเท้าวัดแรงกด สำหรับผู้ป่วยเบาหวาน', e:'👟',
+   parts:[{e:'👣',n:'เซนเซอร์วัดแรงกด (FSR)'},{e:'🔌',n:'ESP32 (มี WiFi)'},{e:'📈',n:'Google Sheets'},{e:'📱',n:'แอปแจ้งเตือนจุดกดทับ'}],
+   done:'🦶 พบจุดกดทับสูง → 📱 แจ้งเตือนก่อนเกิดแผลที่เท้า!'}
+];
+const IOT_FAKES = [
+  [{e:'🌱',n:'เซนเซอร์ความชื้นดิน'},{e:'🔊',n:'ลำโพง'},{e:'🎤',n:'ไมโครโฟนคาราโอเกะ'}],
+  [{e:'💡',n:'หลอดไฟ LED'},{e:'⚙️',n:'มอเตอร์พัดลม'},{e:'🔋',n:'ถ่านไฟฉาย'}],
+  [{e:'💿',n:'แผ่น CD'},{e:'📝',n:'กระดาษจดบันทึก'},{e:'📼',n:'ม้วนวิดีโอเทป'}],
+  [{e:'📠',n:'เครื่องแฟกซ์'},{e:'📯',n:'แตรเป่า'},{e:'✉️',n:'จดหมายทางไปรษณีย์'}]
+];
+
+/* ===== ข้อมูลสถานี 4: ห้องข้อมูลสุขภาพ ===== */
+const DATA_BINS = [{k:'vital',e:'💓',n:'สัญญาณชีพ'},{k:'hist',e:'📋',n:'ประวัติสุขภาพ'},{k:'appt',e:'📅',n:'นัดหมาย'}];
+const DATA_ITEMS = [
+  {k:'vital',t:'ความดันโลหิต 150/95 mmHg'},{k:'vital',t:'ชีพจร 88 ครั้ง/นาที'},{k:'vital',t:'อุณหภูมิร่างกาย 38.2 °C'},
+  {k:'vital',t:'ออกซิเจนในเลือด (SpO₂) 94%'},{k:'vital',t:'อัตราการหายใจ 22 ครั้ง/นาที'},
+  {k:'hist',t:'แพ้ยาเพนิซิลลิน'},{k:'hist',t:'เป็นเบาหวานชนิดที่ 2'},{k:'hist',t:'แพ้อาหารทะเล'},
+  {k:'hist',t:'เคยผ่าตัดไส้ติ่ง ปี 2565'},{k:'hist',t:'มีโรคความดันโลหิตสูง'},
+  {k:'appt',t:'นัดตรวจเลือด 25 ธ.ค. 09.00 น.'},{k:'appt',t:'นัดกายภาพบำบัดทุกวันพุธ'},
+  {k:'appt',t:'นัดพบจักษุแพทย์ 3 ม.ค.'},{k:'appt',t:'นัดรับยาต่อเนื่อง 10 ม.ค.'}
+];
+
 const CYBER = [
   {e:'📧', f:'จาก: lab@hospital.go.th', t:'ผลตรวจเลือดผู้ป่วยเตียง 5 พร้อมแล้วในระบบ HIS', s:true, why:'มาจากอีเมลทางการของโรงพยาบาล และให้ไปดูในระบบ'},
   {e:'📧', f:'จาก: it-support@hospital.go.th', t:'แจ้งปิดปรับปรุงระบบคืนวันเสาร์ 22.00 น. ไม่ต้องกดลิงก์ใด ๆ', s:true, why:'เป็นประกาศจากฝ่าย IT ที่ไม่ขอข้อมูลหรือให้กดลิงก์'},
@@ -431,7 +500,7 @@ async function roll(){
 let cur = null, timerId = null, timeLeft = 0, stScore = 0, locked = false;
 const body = $('stbody');
 function openStation(st){
-  cur = st; stScore = 0; onDrop = null;
+  cur = st; stScore = 0; onDrop = null; clearTimeout(fbTimer); $('fb').className = '';
   $('stName').textContent = `${st.icon} ${st.name}`;
   $('stScore').textContent = 0; $('stTime').textContent = CONFIG.stationTime; $('timeFill').style.width = '100%';
   body.innerHTML = `<div class="overlay"><div class="big">${st.icon}</div><span class="tag">${st.subject}</span><h2>${st.name}</h2><p>${st.how}</p><p>มีเวลา ${CONFIG.stationTime} วินาที</p><button class="btn primary" id="btnStart">เริ่มภารกิจ</button></div>`;
@@ -461,7 +530,7 @@ function endStation(){
   $('fb').className = '';
   G.scores[cur.id] = stScore; G.total += stScore; G.played.push(cur.id);
   const last = G.played.length >= G.target;
-  body.innerHTML = `<div class="overlay"><div class="big">⏱️</div><h2>หมดเวลา!</h2><p>สถานี${cur.name} ได้ <b style="color:var(--coral)">${stScore}</b> คะแนน</p><button class="btn primary" id="btnNext">${last?'ดูผลของฉัน':'กลับไปทอยเต๋า'}</button></div>`;
+  body.innerHTML = `<div class="overlay"><div class="big">⏱️</div><h2>หมดเวลา!</h2><p>สถานี${cur.name} ได้ <b style="color:var(--coral)">${stScore}</b> คะแนน</p>${IMPL[cur.id].finish ? IMPL[cur.id].finish() : ''}<button class="btn primary" id="btnNext">${last?'ดูผลของฉัน':'กลับไปทอยเต๋า'}</button></div>`;
   $('btnNext').onclick = () => { if(last) showSummary(); else { updateProgress(); $('btnRoll').style.display=''; show('boardScreen'); } };
 }
 
@@ -476,7 +545,7 @@ const IMPL = {
         if(el.dataset.id === this.p.a){
           locked = true; el.style.visibility = 'hidden';
           addScore(100); feedback('✔ ถูกต้อง +100 · ' + this.p.why, true, 1600);
-          setTimeout(()=>{ locked = false; if(timerId) this.next(); }, 1600);
+          setTimeout(()=>{ locked = false; if(timerId && cur.id==='device') this.next(); }, 1600);
           return true;
         }
         $('pz').classList.remove('shake'); void $('pz').offsetWidth; $('pz').classList.add('shake');
@@ -492,6 +561,95 @@ const IMPL = {
       $('tray').innerHTML = shuffle([this.p.a, ...others]).map(k=>`<div class="card" data-drag data-id="${k}"><span class="em">${DEVICES[k].e}</span>${DEVICES[k].n}</div>`).join('');
     }
   },
+  repair:{
+    start(){
+      body.innerHTML = `<div class="pz drop" id="pz"><div class="em" id="pzE"></div><div><small id="pzD"></small><div class="txt" id="pzT"></div></div></div><div class="tray t4" id="tray"></div>`;
+      this.queue = shuffle(REPAIRS); this.next();
+      onDrop = (el,z) => {
+        if(locked || z.id!=='pz') return false;
+        if(el.dataset.ok === '1'){
+          locked = true; el.style.visibility = 'hidden';
+          addScore(100); feedback('✔ ซ่อมได้ +100 · ' + this.p.why, true, 1700);
+          setTimeout(()=>{ locked = false; if(timerId && cur.id==='repair') this.next(); }, 1700);
+          return true;
+        }
+        $('pz').classList.remove('shake'); void $('pz').offsetWidth; $('pz').classList.add('shake');
+        feedback('ยังไม่ใช่สาเหตุ ลองวิธีอื่นดูนะ', false, 900);
+        return false;
+      };
+    },
+    next(){
+      if(!this.queue.length) this.queue = shuffle(REPAIRS);
+      this.p = this.queue.pop();
+      $('pzE').textContent = this.p.e; $('pzD').textContent = this.p.d + ' แจ้งว่า'; $('pzT').textContent = this.p.t;
+      const wrong = shuffle(REPAIRS.filter(r=>r.a!==this.p.a)).slice(0,3).map(r=>({a:r.a, ok:0}));
+      $('tray').innerHTML = shuffle([{a:this.p.a, ok:1}, ...wrong]).map(o=>`<div class="card fix" data-drag data-ok="${o.ok}"><span class="em">🛠️</span>${o.a}</div>`).join('');
+    }
+  },
+  iot:{
+    start(){
+      body.innerHTML = `<div class="pz iotbox drop" id="pz"><div class="iothead"><span id="iotE"></span> <span id="iotN"></span></div><div class="pipe" id="pipe"></div></div><div class="tray" id="tray"></div>`;
+      this.queue = shuffle(IOT_PROJECTS); this.newProject();
+      onDrop = (el,z) => {
+        if(locked || z.id!=='pz') return false;
+        if(el.dataset.ok === '1'){
+          el.style.visibility = 'hidden';
+          const part = this.p.parts[this.step];
+          const slot = $('slot'+this.step); slot.classList.add('filled'); slot.innerHTML = `<span class="em">${part.e}</span>${part.n}`;
+          this.step++;
+          if(this.step >= 4){
+            locked = true; addScore(150);
+            feedback('✔ ระบบทำงาน! +150 · ' + this.p.done, true, 2300);
+            setTimeout(()=>{ locked = false; if(timerId && cur.id==='iot') this.newProject(); }, 2300);
+          } else this.showOptions();
+          return true;
+        }
+        $('pz').classList.remove('shake'); void $('pz').offsetWidth; $('pz').classList.add('shake');
+        feedback(`ชิ้นนี้ไม่ใช่${IOT_SLOTS[this.step]}ของระบบนี้`, false, 900);
+        return false;
+      };
+    },
+    newProject(){
+      if(!this.queue.length) this.queue = shuffle(IOT_PROJECTS);
+      this.p = this.queue.pop(); this.step = 0;
+      $('iotE').textContent = this.p.e; $('iotN').textContent = 'โจทย์: ' + this.p.name;
+      $('pipe').innerHTML = IOT_SLOTS.map((n,i)=>`<div class="slot" id="slot${i}"><small>${i+1}</small>${n}</div>`).join('<span class="arrow">➜</span>');
+      this.showOptions();
+    },
+    showOptions(){
+      document.querySelectorAll('.slot').forEach((s,i)=>s.classList.toggle('active', i===this.step));
+      const right = {...this.p.parts[this.step], ok:1};
+      const fakes = shuffle(IOT_FAKES[this.step]).slice(0,2).map(f=>({...f, ok:0}));
+      $('tray').innerHTML = shuffle([right, ...fakes]).map(o=>`<div class="card" data-drag data-ok="${o.ok}"><span class="em">${o.e}</span>${o.n}</div>`).join('');
+    }
+  },
+  data:{
+    start(){
+      body.innerHTML = `<div id="itemArea"></div><div class="bins three">${DATA_BINS.map(b=>`<div class="bin folder drop" data-k="${b.k}"><span class="em">${b.e}</span>${b.n}</div>`).join('')}</div>`;
+      this.queue = shuffle(DATA_ITEMS); this.filed = {vital:[], hist:[], appt:[]}; this.next();
+      onDrop = (el,z) => {
+        if(locked || !z.dataset.k) return false;
+        const right = z.dataset.k === this.it.k;
+        locked = true; el.remove();
+        if(right){ addScore(50); this.filed[this.it.k].push(this.it.t); feedback('✔ เก็บถูกแฟ้ม +50', true, 900); }
+        else { const b = DATA_BINS.find(x=>x.k===this.it.k); feedback(`✖ ข้อมูลนี้ควรอยู่แฟ้ม "${b.n}"`, false, 1600); }
+        setTimeout(()=>{ locked = false; if(timerId && cur.id==='data') this.next(); }, right ? 900 : 1600);
+        return true;
+      };
+    },
+    next(){
+      if(!this.queue.length) this.queue = shuffle(DATA_ITEMS);
+      this.it = this.queue.pop();
+      const d = document.createElement('div');
+      d.className = 'card item pop'; d.setAttribute('data-drag','');
+      d.innerHTML = `<span class="from">📄 ข้อมูลผู้ป่วย นาย ก.</span><span>${this.it.t}</span>`;
+      $('itemArea').appendChild(d);
+    },
+    finish(){
+      const col = b => `<div class="dcol"><b>${b.e} ${b.n}</b>${(this.filed[b.k].slice(-3).map(t=>`<span>${t}</span>`).join('')) || '<span>—</span>'}</div>`;
+      return `<div class="dash"><div class="dtitle">แดชบอร์ดผู้ป่วยที่คุณสร้าง</div><div class="dcols">${DATA_BINS.map(col).join('')}</div></div>`;
+    }
+  },
   cyber:{
     start(){
       body.innerHTML = `<div id="itemArea"></div><div class="bins"><div class="bin safe drop" data-bin="safe"><span class="em">✅</span>ปลอดภัย<br>เก็บเข้าระบบ</div><div class="bin danger drop" data-bin="danger"><span class="em">🚫</span>อันตราย<br>ลบทิ้ง / แจ้ง IT</div></div>`;
@@ -502,7 +660,7 @@ const IMPL = {
         locked = true; el.remove();
         if(right){ addScore(50); feedback('✔ ถูกต้อง +50 · ' + this.it.why, true, 1700); }
         else feedback('✖ ผิดถัง · ' + this.it.why, false, 2200);
-        setTimeout(()=>{ locked = false; if(timerId) this.next(); }, right ? 1700 : 2200);
+        setTimeout(()=>{ locked = false; if(timerId && cur.id==='cyber') this.next(); }, right ? 1700 : 2200);
         return true;
       };
     },
