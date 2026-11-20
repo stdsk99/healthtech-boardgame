@@ -97,5 +97,5 @@ const studentFull = chibi({bg:'#ffe3ec', style:'short', hair:'#3a2a22', extra:['
 
 window.ART = window.ART || {};
 Object.assign(window.ART, {pat, student, studentFull, chibi});
-window.DEV_IMG = {pump:'images/pump.png', incubator:'images/incubator.png'};
+window.DEV_IMG = {pump:'images/pump.png', incubator:'images/incubator.png', o2:'images/o2.png', lumbar:'images/lumbar.png', cervical:'images/cervical.png', ems:'images/ems.png', shock:'images/shock.png', aed:'images/aed.png'};
 })();
