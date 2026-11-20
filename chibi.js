@@ -43,6 +43,9 @@ function chibi(o){
   if(x.includes('bed')) front += `<path d="M30 196 H230 V240 H30 Z" fill="#f4a3c0"/><path d="M30 196 H230" stroke-width="4"/><rect x="40" y="186" width="70" height="18" rx="9" fill="#fff"/>`;
   if(x.includes('laptop')) front += `<rect x="88" y="196" width="84" height="40" rx="6" fill="#d3d1c7"/>`;
   if(x.includes('coat')) front += `<path d="M86 232 V196 C86 176 104 166 130 166 C156 166 174 176 174 196 V232 Z" fill="#fff"/><path d="M118 168 L130 186 L142 168" fill="#2fbf90"/><circle cx="102" cy="214" r="10" fill="${skin}"/><circle cx="158" cy="214" r="10" fill="${skin}"/>`;
+  if(x.includes('phone')) front += `<rect x="112" y="192" width="36" height="40" rx="6" fill="#444441"/><rect x="117" y="197" width="26" height="28" rx="3" fill="#85b7eb" stroke-width="2"/>`;
+  if(x.includes('box')) front += `<rect x="92" y="188" width="76" height="48" rx="4" fill="#d9a35f"/><path d="M92 204 H168 M130 188 V204" stroke-width="3"/>`;
+  if(x.includes('trach')) front += `<rect x="118" y="160" width="24" height="12" rx="4" fill="#fff"/>`;
   if(x.includes('hand')) front += `<circle cx="182" cy="176" r="12" fill="${skin}"/>`;
 
   /* หน้า (นอกขอบสติกเกอร์) */
@@ -90,7 +93,17 @@ const pat = {
   esu:      chibi({bg:'#c9f0e2', style:'short', shirt:'#5dcaa5', mood:'happy', extra:['scrub','cap','mask','scalpel']}),
   pump:     chibi({bg:'#ffe3ec', style:'long', hair:'#412402', shirt:'#f4c0d1', mood:'sad', extra:['thermo','sweat']}),
   incubator:chibi({bg:'#ffe3ec', style:'baby', skin:'#ffdcc4', mood:'sleep', extra:['swaddle','hand','sensor','zzz']}),
-  suction:  chibi({bg:'#dfe8f2', style:'bald', hair:'#d9d9de', shirt:'#b5d4f4', mood:'tired', extra:['bed','sweat']})
+  suction:  chibi({bg:'#dfe8f2', style:'bald', hair:'#d9d9de', shirt:'#b5d4f4', mood:'tired', extra:['bed','sweat']}),
+  lumbar2:  chibi({bg:'#ffe9c9', style:'short', hair:'#2c2c2a', shirt:'#97c459', mood:'pain', extra:['box','backpain','sweat']}),
+  cervical2:chibi({bg:'#e5e1ff', style:'long', hair:'#3a2a22', shirt:'#ed93b1', mood:'sad', extra:['phone','neckpain']}),
+  o2b:      chibi({bg:'#d6f0f7', style:'bald', hair:'#d9d9de', shirt:'#85b7eb', mood:'tired', extra:['glasses','cannula','puff','sweat']}),
+  ems2:     chibi({bg:'#fdf0e2', style:'bun', hair:'#e4e4e8', shirt:'#c0dd97', mood:'sad', extra:['bed']}),
+  shock2:   chibi({bg:'#ffe3ec', style:'long', hair:'#5a3a2a', shirt:'#afa9ec', mood:'pain', extra:['sweat']}),
+  aed2:     chibi({bg:'#ffd1d1', style:'short', hair:'#2c2c2a', shirt:'#ff8a5a', mood:'ko', extra:['headband','zap']}),
+  esu2:     chibi({bg:'#c9f0e2', style:'long', hair:'#2c2c2a', shirt:'#85b7eb', mood:'happy', extra:['scrub','cap','mask','scalpel']}),
+  pump2:    chibi({bg:'#e6f1fb', style:'short', hair:'#444441', shirt:'#fac775', mood:'sad', extra:['thermo','sweat']}),
+  incubator2:chibi({bg:'#e1f5ee', style:'baby', skin:'#ffdcc4', hat:'#9fe1cb', hat2:'#5dcaa5', mood:'sleep', extra:['swaddle','hand','sensor','zzz']}),
+  suction2: chibi({bg:'#f1efe8', style:'short', hair:'#444441', shirt:'#b5d4f4', mood:'tired', extra:['bed','trach','sweat']})
 };
 const student = chibi({style:'short', hair:'#3a2a22', extra:['coat','steth'], vb:'60 36 140 140'});
 const studentFull = chibi({bg:'#ffe3ec', style:'short', hair:'#3a2a22', extra:['coat','steth']});
