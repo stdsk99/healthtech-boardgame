@@ -341,7 +341,10 @@ const DATA_ITEMS = [
   {k:'hist',t:'แพ้ยาเพนิซิลลิน'},{k:'hist',t:'เป็นเบาหวานชนิดที่ 2'},{k:'hist',t:'แพ้อาหารทะเล'},
   {k:'hist',t:'เคยผ่าตัดไส้ติ่ง ปี 2565'},{k:'hist',t:'มีโรคความดันโลหิตสูง'},
   {k:'appt',t:'นัดตรวจเลือด 25 ธ.ค. 09.00 น.'},{k:'appt',t:'นัดกายภาพบำบัดทุกวันพุธ'},
-  {k:'appt',t:'นัดพบจักษุแพทย์ 3 ม.ค.'},{k:'appt',t:'นัดรับยาต่อเนื่อง 10 ม.ค.'}
+  {k:'appt',t:'นัดพบจักษุแพทย์ 3 ม.ค.'},{k:'appt',t:'นัดรับยาต่อเนื่อง 10 ม.ค.'},
+  {k:'vital',t:'ระดับความปวด 6/10'},{k:'vital',t:'ชีพจร 112 ครั้ง/นาที ขณะพัก'},{k:'vital',t:'ความดันโลหิต 98/60 mmHg'},{k:'vital',t:'อุณหภูมิร่างกาย 36.8 °C'},
+  {k:'hist',t:'แพ้ยาแอสไพริน'},{k:'hist',t:'เป็นโรคหอบหืดตั้งแต่เด็ก'},{k:'hist',t:'สูบบุหรี่วันละ 10 มวน'},{k:'hist',t:'เคยผ่าตัดเปลี่ยนข้อเข่า ปี 2563'},
+  {k:'appt',t:'นัดฉีดวัคซีนไข้หวัดใหญ่ 5 ม.ค.'},{k:'appt',t:'นัดทำฟัน 12 ม.ค. 13.30 น.'},{k:'appt',t:'นัดติดตามผลเบาหวานอีก 3 เดือน'},{k:'appt',t:'นัดเจาะเลือดก่อนพบแพทย์ 20 ม.ค. 07.30 น.'}
 ];
 
 const CYBER = [
@@ -354,6 +357,20 @@ const CYBER = [
   {e:'⚠️', f:'จาก: security@hosp1tal-th.com', t:'ด่วน! ยืนยันรหัสผ่านภายใน 1 ชม. ไม่งั้นบัญชีถูกปิด', s:false, why:'โดเมนสะกดผิด (1 แทน i) และเร่งให้รีบทำ'},
   {e:'💬', f:'LINE ส่วนตัว', t:'ขอเลขบัตรประชาชนและประวัติผู้ป่วยหน่อย ด่วน', s:false, why:'ข้อมูลผู้ป่วยได้รับการคุ้มครองตาม PDPA ห้ามส่งทางช่องทางส่วนตัว'},
   {e:'💾', f:'พบในลานจอดรถ', t:'แฟลชไดรฟ์ไม่ทราบที่มา เขียนว่า "เงินเดือนพนักงาน"', s:false, why:'อุปกรณ์ไม่ทราบที่มาอาจฝังมัลแวร์ ห้ามเสียบเครื่อง'},
+  {e:'📧', f:'จาก: hr@hospital.go.th', t:'ตารางอบรมประจำปี ลงชื่อได้ในระบบอินทราเน็ตของโรงพยาบาล', s:true, why:'มาจากอีเมลทางการ และให้ไปลงชื่อในระบบภายในเอง'},
+  {e:'📅', f:'ระบบ HIS', t:'ครบรอบ 90 วัน กรุณาเปลี่ยนรหัสผ่านที่หน้าเว็บของโรงพยาบาล', s:true, why:'ระบบไม่ขอรหัสผ่าน แต่ให้เข้าไปเปลี่ยนเองในระบบจริง'},
+  {e:'📅', f:'ระบบ PACS', t:'ผลเอกซเรย์ทรวงอกของผู้ป่วยเตียง 3 พร้อมให้แพทย์ดู', s:true, why:'เป็นงานปกติในระบบภาพทางการแพทย์ของโรงพยาบาล'},
+  {e:'💬', f:'แชตภายในโรงพยาบาล', t:'พี่พยาบาลเวรเช้าขอดูแบบฟอร์มส่งเวร', s:true, why:'คุยเรื่องงานผ่านช่องทางภายในที่องค์กรอนุญาต'},
+  {e:'📎', f:'จาก: headnurse@hospital.go.th', t:'ไฟล์แนบ ตารางเวร_ธค.xlsx', s:true, why:'ไฟล์ปกติจากอีเมลทางการของคนที่รู้จัก'},
+  {e:'📅', f:'ระบบสำรองข้อมูล', t:'สำรองข้อมูลอัตโนมัติสำเร็จ เวลา 02.00 น.', s:true, why:'การแจ้งเตือนปกติจากระบบ ไม่ขอให้ทำอะไร'},
+  {e:'💬', f:'SMS จาก: 0812345xxx', t:'พัสดุของคุณตกค้าง กดลิงก์ bit.ly/xxxx เพื่อชำระค่าส่ง', s:false, why:'ลิงก์สั้นจากเบอร์แปลก ๆ มักพาไปเว็บหลอกขโมยข้อมูล'},
+  {e:'📞', f:'สายโทรเข้า', t:'อ้างว่าเป็นฝ่าย IT ขอรหัส OTP ที่เพิ่งส่งเข้ามือถือ', s:false, why:'ฝ่าย IT ตัวจริงไม่มีวันขอรหัส OTP'},
+  {e:'🌐', f:'ป๊อปอัปบนเว็บไซต์', t:'เครื่องของคุณติดไวรัส! โทรหาเราด่วนเพื่อแก้ไข', s:false, why:'เป็นการหลอกให้ตกใจแล้วโทรไปจ่ายเงินหรือให้ควบคุมเครื่อง'},
+  {e:'📎', f:'จาก: billing@invoice-center.net', t:'ไฟล์แนบ ใบแจ้งหนี้.zip', s:false, why:'ไฟล์ zip จากผู้ส่งไม่รู้จัก มักซ่อนมัลแวร์ไว้ข้างใน'},
+  {e:'🔳', f:'สติกเกอร์ที่ลานจอดรถ', t:'QR code แปะทับป้าย สแกนเพื่อจ่ายค่าจอดรถ', s:false, why:'QR ปลอมแปะทับของจริง พาไปเว็บหลอกเอาเงิน'},
+  {e:'📎', f:'ไฟล์แนบ', t:'รายชื่อผู้ป่วย.xlsm ขึ้นว่าต้องกด Enable Macros ก่อนเปิด', s:false, why:'มาโครในไฟล์อาจเป็นโค้ดอันตราย อย่าเปิดใช้ถ้าไม่แน่ใจ'},
+  {e:'📶', f:'Wi-Fi ใกล้คุณ', t:'Hospital_Free_WiFi (ไม่มีรหัสผ่าน)', s:false, why:'Wi-Fi ที่ฝ่าย IT ไม่ได้ตั้ง อาจถูกดักข้อมูล'},
+  {e:'💬', f:'เพื่อนร่วมงาน', t:'ขอยืมรหัสเข้า HIS หน่อย ลืมรหัสตัวเอง', s:false, why:'ห้ามแชร์รหัส ทุกการเข้าถึงข้อมูลผู้ป่วยต้องเป็นของตัวเอง'},
   {e:'💸', f:'จาก: ceo.hospital@gmail.com', t:'ผู้อำนวยการขอให้โอนเงินด่วนไปบัญชีนี้ อย่าบอกใคร', s:false, why:'ปลอมเป็นผู้บริหารผ่านอีเมลส่วนตัว และขอให้ปิดเป็นความลับ'}
 ];
 
@@ -566,7 +583,7 @@ let G = null, rolling = false;
 const readyStations = () => STATIONS.filter(s=>s.ready);
 function newGame(){
   const target = Math.min(CONFIG.stationsPerGame, readyStations().length);
-  G = {pos:0, played:[], scores:{}, total:0, target};
+  G = {pos:0, played:[], scores:{}, total:0, target, seen:new Map()};
   buildBoard(); placeToken(0); token.innerHTML = ART.student; $('hosp').innerHTML = ART.hospital;
   setDice(0);
   $('btnRoll').style.display = '';
@@ -616,6 +633,19 @@ function runStation(){
     if(timeLeft <= 0) endStation();
   }, 100);
 }
+function pickFresh(list){
+  G.seen = G.seen || new Map();
+  if(!G.seen.has(list)) G.seen.set(list, new Set());
+  const used = G.seen.get(list), left = list.filter(x=>!used.has(x));
+  if(!left.length) return null;
+  const x = left[Math.floor(Math.random()*left.length)]; used.add(x); return x;
+}
+function allDone(){
+  if(!timerId) return;
+  clearInterval(timerId); timerId = null; onDrop = null;
+  addScore(100); feedback('🎉 ตอบครบทุกข้อแล้ว! โบนัส +100', true, 1600);
+  setTimeout(endStation, 1700);
+}
 function addScore(n){ stScore += n; $('stScore').textContent = stScore; }
 let fbTimer = null;
 function feedback(text, good, ms=1300){
@@ -636,7 +666,7 @@ const IMPL = {
   device:{
     start(){
       body.innerHTML = `<div class="pz drop" id="pz"><div class="art pat" id="pzE"></div><div><small>อาการผู้ป่วย</small><div class="txt" id="pzT"></div></div></div><div class="tray" id="tray"></div>`;
-      this.queue = shuffle(PATIENTS); this.next();
+      this.queue = []; this.next();
       onDrop = (el,z) => {
         if(locked || z.id!=='pz') return false;
         if(el.dataset.id === this.p.a){
@@ -651,8 +681,8 @@ const IMPL = {
       };
     },
     next(){
-      if(!this.queue.length) this.queue = shuffle(PATIENTS);
-      this.p = this.queue.pop();
+      const nx = pickFresh(PATIENTS); if(!nx) return allDone();
+      this.p = nx;
       $('pzE').innerHTML = ART.pat[this.p.a]; $('pzT').textContent = this.p.t;
       const others = shuffle(Object.keys(DEVICES).filter(k=>k!==this.p.a)).slice(0,4);
       $('tray').innerHTML = shuffle([this.p.a, ...others]).map(k=>`<div class="card" data-drag data-id="${k}"><span class="art">${DEV_IMG[k] ? `<img src="${DEV_IMG[k]}" alt="">` : ART.dev[k]}</span>${DEVICES[k].n}</div>`).join('');
@@ -661,7 +691,7 @@ const IMPL = {
   repair:{
     start(){
       body.innerHTML = `<div class="pz drop" id="pz"><div class="art pat devimg" id="pzE"></div><div><small id="pzD"></small><div class="txt" id="pzT"></div></div></div><div class="tray t4" id="tray"></div>`;
-      this.queue = shuffle(REPAIRS); this.next();
+      this.queue = []; this.next();
       onDrop = (el,z) => {
         if(locked || z.id!=='pz') return false;
         if(el.dataset.ok === '1'){
@@ -676,8 +706,8 @@ const IMPL = {
       };
     },
     next(){
-      if(!this.queue.length) this.queue = shuffle(REPAIRS);
-      this.p = this.queue.pop();
+      const nx = pickFresh(REPAIRS); if(!nx) return allDone();
+      this.p = nx;
       $('pzE').innerHTML = `<img src="${DEV_IMG[this.p.k]}" alt="">`; $('pzD').textContent = this.p.d + ' แจ้งว่า'; $('pzT').textContent = this.p.t;
       const wrong = shuffle(REPAIRS.filter(r=>r.a!==this.p.a)).slice(0,3).map(r=>({a:r.a, ok:0}));
       $('tray').innerHTML = shuffle([{a:this.p.a, ok:1}, ...wrong]).map(o=>`<div class="card fix" data-drag data-ok="${o.ok}"><span class="em">🛠️</span>${o.a}</div>`).join('');
@@ -686,7 +716,7 @@ const IMPL = {
   iot:{
     start(){
       body.innerHTML = `<div class="pz iotbox drop" id="pz"><div class="iothead"><span id="iotE"></span> <span id="iotN"></span></div><div class="pipe" id="pipe"></div></div><div class="tray" id="tray"></div>`;
-      this.queue = shuffle(IOT_PROJECTS); this.newProject();
+      this.queue = []; this.newProject();
       onDrop = (el,z) => {
         if(locked || z.id!=='pz') return false;
         if(el.dataset.ok === '1'){
@@ -707,8 +737,8 @@ const IMPL = {
       };
     },
     newProject(){
-      if(!this.queue.length) this.queue = shuffle(IOT_PROJECTS);
-      this.p = this.queue.pop(); this.step = 0;
+      const nx = pickFresh(IOT_PROJECTS); if(!nx) return allDone();
+      this.p = nx; this.step = 0;
       $('iotE').textContent = this.p.e; $('iotN').textContent = 'โจทย์: ' + this.p.name;
       $('pipe').innerHTML = IOT_SLOTS.map((n,i)=>`<div class="slot" id="slot${i}"><small>${i+1}</small>${n}</div>`).join('<span class="arrow">➜</span>');
       this.showOptions();
@@ -723,7 +753,7 @@ const IMPL = {
   data:{
     start(){
       body.innerHTML = `<div id="itemArea"></div><div class="bins three">${DATA_BINS.map(b=>`<div class="bin folder f-${b.k} drop" data-k="${b.k}"><span class="art fold">${UI.folder[b.k]}</span>${b.n}</div>`).join('')}</div>`;
-      this.queue = shuffle(DATA_ITEMS); this.filed = {vital:[], hist:[], appt:[]}; this.next();
+      this.queue = []; this.filed = {vital:[], hist:[], appt:[]}; this.next();
       onDrop = (el,z) => {
         if(locked || !z.dataset.k) return false;
         const right = z.dataset.k === this.it.k;
@@ -735,8 +765,8 @@ const IMPL = {
       };
     },
     next(){
-      if(!this.queue.length) this.queue = shuffle(DATA_ITEMS);
-      this.it = this.queue.pop();
+      const nx = pickFresh(DATA_ITEMS); if(!nx) return allDone();
+      this.it = nx;
       const d = document.createElement('div');
       d.className = 'card item pop'; d.setAttribute('data-drag','');
       d.classList.add('doc'); d.innerHTML = `<div class="dochead"><span class="art mini">${UI.doc}</span><span>บันทึกผู้ป่วย · นาย ก. (HN 650123)</span></div><div class="docbody">${this.it.t}</div>`;
@@ -750,7 +780,7 @@ const IMPL = {
   cyber:{
     start(){
       body.innerHTML = `<div id="itemArea"></div><div class="bins"><div class="bin safe drop" data-bin="safe"><span class="art bico">${UI.shield}</span>ปลอดภัย<br>เก็บเข้าระบบ</div><div class="bin danger drop" data-bin="danger"><span class="art bico">${UI.trash}</span>อันตราย<br>ลบทิ้ง / แจ้ง IT</div></div>`;
-      this.queue = shuffle(CYBER); this.next();
+      this.queue = []; this.next();
       onDrop = (el,z) => {
         if(locked || !z.dataset.bin) return false;
         const right = (z.dataset.bin === 'safe') === this.it.s;
@@ -762,8 +792,8 @@ const IMPL = {
       };
     },
     next(){
-      if(!this.queue.length) this.queue = shuffle(CYBER);
-      this.it = this.queue.pop();
+      const nx = pickFresh(CYBER); if(!nx) return allDone();
+      this.it = nx;
       const d = document.createElement('div');
       d.className = 'card item pop'; d.setAttribute('data-drag','');
       const kd = UI.kindOf(this.it.e); d.classList.add('mail'); d.innerHTML = `<div class="wbar"><i></i><i></i><i></i><span>${UI.kindLabel[kd]}</span></div><div class="wbody"><span class="art kico">${UI.kind[kd]}</span><div><span class="from">${this.it.f}</span><div class="subj">${this.it.t}</div></div></div>`;
