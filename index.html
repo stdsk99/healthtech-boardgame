@@ -144,6 +144,9 @@ h1{font-size:clamp(28px,8vmin,80px);font-weight:600;color:var(--teal-d);text-ali
 .art{display:block;flex:none}
 .card .art{width:calc(var(--cw)*.58);height:calc(var(--cw)*.58);margin-bottom:.3em}
 .pz .art.pat{width:clamp(70px,17vmin,150px);height:clamp(70px,17vmin,150px)}
+.art img{width:100%;height:100%;object-fit:contain;display:block}
+.pz .art.pat svg{border-radius:2.4vmin}
+#token{background:#ffe3ec}
 .conf{position:fixed;width:12px;height:16px;border-radius:3px;z-index:300;pointer-events:none;animation:conf 1.2s ease-out forwards}
 @keyframes conf{to{transform:translate(var(--dx),calc(var(--dy) + 60vh)) rotate(var(--r));opacity:0}}
 </style>
@@ -213,6 +216,7 @@ h1{font-size:clamp(28px,8vmin,80px);font-weight:600;color:var(--teal-d);text-ali
 </section>
 
 <script src="art.js"></script>
+<script src="chibi.js"></script>
 <script>
 /* ===== ตั้งค่า (แก้ได้) ===== */
 const CONFIG = {
@@ -601,7 +605,7 @@ const IMPL = {
       this.p = this.queue.pop();
       $('pzE').innerHTML = ART.pat[this.p.a]; $('pzT').textContent = this.p.t;
       const others = shuffle(Object.keys(DEVICES).filter(k=>k!==this.p.a)).slice(0,4);
-      $('tray').innerHTML = shuffle([this.p.a, ...others]).map(k=>`<div class="card" data-drag data-id="${k}"><span class="art">${ART.dev[k]}</span>${DEVICES[k].n}</div>`).join('');
+      $('tray').innerHTML = shuffle([this.p.a, ...others]).map(k=>`<div class="card" data-drag data-id="${k}"><span class="art">${DEV_IMG[k] ? `<img src="${DEV_IMG[k]}" alt="">` : ART.dev[k]}</span>${DEVICES[k].n}</div>`).join('');
     }
   },
   repair:{
