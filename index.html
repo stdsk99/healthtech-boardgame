@@ -149,6 +149,21 @@ h1{font-size:clamp(28px,8vmin,80px);font-weight:600;color:var(--teal-d);text-ali
 #token{background:#ffe3ec}
 .pz .art.devimg{background:#fff;border-radius:2.4vmin}
 .slot .art.simg{width:clamp(30px,7vmin,64px);height:clamp(30px,7vmin,64px)}
+.card.item.doc,.card.item.mail{padding:0;overflow:hidden;align-items:stretch;gap:0}
+.dochead{display:flex;align-items:center;gap:1.4vmin;background:#e1f5ee;color:#085041;font-size:clamp(12px,2.2vmin,20px);padding:1.2vmin 2.4vmin;border-bottom:2px solid #cfe5df}
+.art.mini{width:clamp(22px,4.4vmin,40px);height:clamp(22px,4.4vmin,40px)}
+.docbody{padding:2.6vmin 3vmin;font-size:clamp(17px,3.8vmin,36px);font-weight:500;background:repeating-linear-gradient(#fff 0 calc(1.6em - 1px),#eef3f1 calc(1.6em - 1px) 1.6em)}
+.bin.folder.f-vital{border-color:#f09595;background:#fcebeb;color:#791f1f}
+.bin.folder.f-hist{border-color:#fac775;background:#faeeda;color:#633806}
+.bin.folder.f-appt{border-color:#85b7eb;background:#e6f1fb;color:#0c447c}
+.art.fold,.art.bico{width:clamp(40px,10vmin,96px);height:clamp(40px,10vmin,96px);margin-bottom:.6vmin}
+.wbar{display:flex;align-items:center;gap:.8vmin;background:#f1efe8;border-bottom:2px solid #d3d1c7;padding:1vmin 2vmin;font-size:clamp(11px,2vmin,18px);color:#5f5e5a}
+.wbar i{width:1.4vmin;height:1.4vmin;min-width:8px;min-height:8px;border-radius:50%;background:#f09595}
+.wbar i:nth-child(2){background:#fac775}.wbar i:nth-child(3){background:#97c459}
+.wbar span{margin-left:1vmin}
+.wbody{display:flex;align-items:center;gap:2.4vmin;padding:2.4vmin 3vmin}
+.art.kico{width:clamp(36px,9vmin,80px);height:clamp(36px,9vmin,80px)}
+.subj{font-size:clamp(16px,3.4vmin,32px);font-weight:500;line-height:1.3}
 .conf{position:fixed;width:12px;height:16px;border-radius:3px;z-index:300;pointer-events:none;animation:conf 1.2s ease-out forwards}
 @keyframes conf{to{transform:translate(var(--dx),calc(var(--dy) + 60vh)) rotate(var(--r));opacity:0}}
 </style>
@@ -219,6 +234,7 @@ h1{font-size:clamp(28px,8vmin,80px);font-weight:600;color:var(--teal-d);text-ali
 
 <script src="art.js"></script>
 <script src="chibi.js"></script>
+<script src="ui-art.js"></script>
 <script>
 /* ===== ตั้งค่า (แก้ได้) ===== */
 const CONFIG = {
@@ -674,7 +690,7 @@ const IMPL = {
   },
   data:{
     start(){
-      body.innerHTML = `<div id="itemArea"></div><div class="bins three">${DATA_BINS.map(b=>`<div class="bin folder drop" data-k="${b.k}"><span class="em">${b.e}</span>${b.n}</div>`).join('')}</div>`;
+      body.innerHTML = `<div id="itemArea"></div><div class="bins three">${DATA_BINS.map(b=>`<div class="bin folder f-${b.k} drop" data-k="${b.k}"><span class="art fold">${UI.folder[b.k]}</span>${b.n}</div>`).join('')}</div>`;
       this.queue = shuffle(DATA_ITEMS); this.filed = {vital:[], hist:[], appt:[]}; this.next();
       onDrop = (el,z) => {
         if(locked || !z.dataset.k) return false;
@@ -691,7 +707,7 @@ const IMPL = {
       this.it = this.queue.pop();
       const d = document.createElement('div');
       d.className = 'card item pop'; d.setAttribute('data-drag','');
-      d.innerHTML = `<span class="from">📄 ข้อมูลผู้ป่วย นาย ก.</span><span>${this.it.t}</span>`;
+      d.classList.add('doc'); d.innerHTML = `<div class="dochead"><span class="art mini">${UI.doc}</span><span>บันทึกผู้ป่วย · นาย ก. (HN 650123)</span></div><div class="docbody">${this.it.t}</div>`;
       $('itemArea').appendChild(d);
     },
     finish(){
@@ -701,7 +717,7 @@ const IMPL = {
   },
   cyber:{
     start(){
-      body.innerHTML = `<div id="itemArea"></div><div class="bins"><div class="bin safe drop" data-bin="safe"><span class="em">✅</span>ปลอดภัย<br>เก็บเข้าระบบ</div><div class="bin danger drop" data-bin="danger"><span class="em">🚫</span>อันตราย<br>ลบทิ้ง / แจ้ง IT</div></div>`;
+      body.innerHTML = `<div id="itemArea"></div><div class="bins"><div class="bin safe drop" data-bin="safe"><span class="art bico">${UI.shield}</span>ปลอดภัย<br>เก็บเข้าระบบ</div><div class="bin danger drop" data-bin="danger"><span class="art bico">${UI.trash}</span>อันตราย<br>ลบทิ้ง / แจ้ง IT</div></div>`;
       this.queue = shuffle(CYBER); this.next();
       onDrop = (el,z) => {
         if(locked || !z.dataset.bin) return false;
@@ -718,7 +734,7 @@ const IMPL = {
       this.it = this.queue.pop();
       const d = document.createElement('div');
       d.className = 'card item pop'; d.setAttribute('data-drag','');
-      d.innerHTML = `<span class="em">${this.it.e}</span><span class="from">${this.it.f}</span><span>${this.it.t}</span>`;
+      const kd = UI.kindOf(this.it.e); d.classList.add('mail'); d.innerHTML = `<div class="wbar"><i></i><i></i><i></i><span>${UI.kindLabel[kd]}</span></div><div class="wbody"><span class="art kico">${UI.kind[kd]}</span><div><span class="from">${this.it.f}</span><div class="subj">${this.it.t}</div></div></div>`;
       $('itemArea').appendChild(d);
     }
   }
