@@ -147,6 +147,8 @@ h1{font-size:clamp(28px,8vmin,80px);font-weight:600;color:var(--teal-d);text-ali
 .art img{width:100%;height:100%;object-fit:contain;display:block}
 .pz .art.pat svg{border-radius:2.4vmin}
 #token{background:#ffe3ec}
+.pz .art.devimg{background:#fff;border-radius:2.4vmin}
+.slot .art.simg{width:clamp(30px,7vmin,64px);height:clamp(30px,7vmin,64px)}
 .conf{position:fixed;width:12px;height:16px;border-radius:3px;z-index:300;pointer-events:none;animation:conf 1.2s ease-out forwards}
 @keyframes conf{to{transform:translate(var(--dx),calc(var(--dy) + 60vh)) rotate(var(--r));opacity:0}}
 </style>
@@ -277,27 +279,27 @@ const PATIENTS = [
 /* ===== ข้อมูลสถานี 5: ไซเบอร์ ===== */
 /* ===== ข้อมูลสถานี 2: ศูนย์ซ่อมบำรุง ===== */
 const REPAIRS = [
-  {e:'💧', d:'เครื่องให้สารละลาย', t:'แจ้งเตือน Occlusion (การไหลถูกอุดกั้น)', a:'ตรวจสายน้ำเกลือพับ หรือแคลมป์ปิดอยู่', why:'สายพับหรือแคลมป์ปิดทำให้แรงดันในสายสูง เครื่องจึงเตือน'},
-  {e:'💧', d:'เครื่องให้สารละลาย', t:'แจ้งเตือน Air-in-line (มีฟองอากาศในสาย)', a:'ไล่ฟองอากาศออกจากสาย แล้วเริ่มใหม่', why:'ฟองอากาศเข้าหลอดเลือดอันตราย เครื่องจึงหยุดและเตือน'},
-  {e:'👶', d:'ตู้อบทารก', t:'อุณหภูมิในตู้ไม่ขึ้นถึงค่าที่ตั้งไว้', a:'ตรวจฮีตเตอร์และพัดลมหมุนเวียนอากาศ', why:'ฮีตเตอร์และพัดลมคือหัวใจของการคุมอุณหภูมิในตู้'},
-  {e:'🫁', d:'เครื่องผลิตออกซิเจน', t:'ความเข้มข้นออกซิเจนต่ำกว่าปกติ', a:'ทำความสะอาด / เปลี่ยนแผ่นกรองอากาศเข้า', why:'แผ่นกรองอุดตันทำให้อากาศเข้าไม่พอ ออกซิเจนจึงต่ำ'},
-  {e:'🫁', d:'เครื่องผลิตออกซิเจน', t:'เปิดสวิตช์แล้วเครื่องไม่ทำงาน ไฟไม่ติด', a:'ตรวจปลั๊ก ฟิวส์ และสายไฟ', why:'เริ่มจากสิ่งง่ายที่สุดก่อนเสมอ คือแหล่งจ่ายไฟ'},
-  {e:'🌀', d:'เครื่องดูดเสมหะ', t:'แรงดูดอ่อนผิดปกติ', a:'ตรวจขวดรองรับเต็ม หรือสายและฝาขวดรั่ว', why:'ขวดเต็มหรือจุดรั่วทำให้สูญเสียแรงดูด'},
-  {e:'❤️‍🩹', d:'เครื่อง AED', t:'ไฟสถานะเป็นสีแดง เครื่องไม่พร้อมใช้', a:'เปลี่ยนแบตเตอรี่ หรือแผ่นอิเล็กโทรดที่หมดอายุ', why:'AED ตรวจตัวเองทุกวัน ไฟแดงมักหมายถึงแบตหรือแผ่นหมดอายุ'},
-  {e:'🩺', d:'เครื่องวัดความดันอัตโนมัติ', t:'วัดค่าไม่ขึ้น ผ้าพันแขนพองไม่เต็ม', a:'ตรวจรอยรั่วของผ้าพันแขนและสายลม', why:'ลมรั่วทำให้สร้างแรงดันไม่ได้ จึงวัดค่าไม่ได้'}
+  {k:'pump', e:'💧', d:'เครื่องให้สารละลาย', t:'แจ้งเตือน Occlusion (การไหลถูกอุดกั้น)', a:'ตรวจสายน้ำเกลือพับ หรือแคลมป์ปิดอยู่', why:'สายพับหรือแคลมป์ปิดทำให้แรงดันในสายสูง เครื่องจึงเตือน'},
+  {k:'pump', e:'💧', d:'เครื่องให้สารละลาย', t:'แจ้งเตือน Air-in-line (มีฟองอากาศในสาย)', a:'ไล่ฟองอากาศออกจากสาย แล้วเริ่มใหม่', why:'ฟองอากาศเข้าหลอดเลือดอันตราย เครื่องจึงหยุดและเตือน'},
+  {k:'incubator', e:'👶', d:'ตู้อบทารก', t:'อุณหภูมิในตู้ไม่ขึ้นถึงค่าที่ตั้งไว้', a:'ตรวจฮีตเตอร์และพัดลมหมุนเวียนอากาศ', why:'ฮีตเตอร์และพัดลมคือหัวใจของการคุมอุณหภูมิในตู้'},
+  {k:'o2', e:'🫁', d:'เครื่องผลิตออกซิเจน', t:'ความเข้มข้นออกซิเจนต่ำกว่าปกติ', a:'ทำความสะอาด / เปลี่ยนแผ่นกรองอากาศเข้า', why:'แผ่นกรองอุดตันทำให้อากาศเข้าไม่พอ ออกซิเจนจึงต่ำ'},
+  {k:'o2', e:'🫁', d:'เครื่องผลิตออกซิเจน', t:'เปิดสวิตช์แล้วเครื่องไม่ทำงาน ไฟไม่ติด', a:'ตรวจปลั๊ก ฟิวส์ และสายไฟ', why:'เริ่มจากสิ่งง่ายที่สุดก่อนเสมอ คือแหล่งจ่ายไฟ'},
+  {k:'suction', e:'🌀', d:'เครื่องดูดเสมหะ', t:'แรงดูดอ่อนผิดปกติ', a:'ตรวจขวดรองรับเต็ม หรือสายและฝาขวดรั่ว', why:'ขวดเต็มหรือจุดรั่วทำให้สูญเสียแรงดูด'},
+  {k:'aed', e:'❤️‍🩹', d:'เครื่อง AED', t:'ไฟสถานะเป็นสีแดง เครื่องไม่พร้อมใช้', a:'เปลี่ยนแบตเตอรี่ หรือแผ่นอิเล็กโทรดที่หมดอายุ', why:'AED ตรวจตัวเองทุกวัน ไฟแดงมักหมายถึงแบตหรือแผ่นหมดอายุ'},
+  {k:'bp', e:'🩺', d:'เครื่องวัดความดันอัตโนมัติ', t:'วัดค่าไม่ขึ้น ผ้าพันแขนพองไม่เต็ม', a:'ตรวจรอยรั่วของผ้าพันแขนและสายลม', why:'ลมรั่วทำให้สร้างแรงดันไม่ได้ จึงวัดค่าไม่ได้'}
 ];
 
 /* ===== ข้อมูลสถานี 3: แล็บ IoT ===== */
 const IOT_SLOTS = ['เซนเซอร์','สมองกล','คลาวด์','แจ้งเตือน'];
 const IOT_PROJECTS = [
   {name:'ไม้เท้าอัจฉริยะ แจ้งเตือนผู้สูงอายุหกล้ม', e:'🦯',
-   parts:[{e:'🧭',n:'เซนเซอร์วัดความเร่ง (IMU)'},{e:'🔌',n:'ESP32 (มี WiFi)'},{e:'📈',n:'Google Sheets'},{e:'💬',n:'LINE แจ้งเตือนลูกหลาน'}],
+   parts:[{e:'🧭',n:'เซนเซอร์วัดความเร่ง (IMU)',img:'images/imu.png'},{e:'🔌',n:'ESP32 (มี WiFi)',img:'images/esp32.png'},{e:'📈',n:'Google Sheets'},{e:'💬',n:'LINE แจ้งเตือนลูกหลาน'}],
    done:'👵 คุณยายหกล้ม → 📱 ลูกได้รับแจ้งเตือนทาง LINE ทันที!'},
   {name:'เครื่องวัดฝุ่น PM2.5 ในห้องเรียน', e:'🌫️',
-   parts:[{e:'🌫️',n:'เซนเซอร์ฝุ่น PM2.5'},{e:'🔌',n:'ESP32 (มี WiFi)'},{e:'📈',n:'Google Sheets'},{e:'📊',n:'แดชบอร์ดเว็บ + ไฟเตือนสี'}],
+   parts:[{e:'🌫️',n:'เซนเซอร์ฝุ่น PM2.5',img:'images/pm25.png'},{e:'🔌',n:'ESP32 (มี WiFi)',img:'images/esp32.png'},{e:'📈',n:'Google Sheets'},{e:'📊',n:'แดชบอร์ดเว็บ + ไฟเตือนสี'}],
    done:'😷 ฝุ่นเกินมาตรฐาน → 🔴 ไฟแดงขึ้น ครูสั่งปิดหน้าต่างทันที!'},
   {name:'แผ่นรองเท้าวัดแรงกด สำหรับผู้ป่วยเบาหวาน', e:'👟',
-   parts:[{e:'👣',n:'เซนเซอร์วัดแรงกด (FSR)'},{e:'🔌',n:'ESP32 (มี WiFi)'},{e:'📈',n:'Google Sheets'},{e:'📱',n:'แอปแจ้งเตือนจุดกดทับ'}],
+   parts:[{e:'👣',n:'เซนเซอร์วัดแรงกด (FSR)',img:'images/fsr.png'},{e:'🔌',n:'ESP32 (มี WiFi)',img:'images/esp32.png'},{e:'📈',n:'Google Sheets'},{e:'📱',n:'แอปแจ้งเตือนจุดกดทับ'}],
    done:'🦶 พบจุดกดทับสูง → 📱 แจ้งเตือนก่อนเกิดแผลที่เท้า!'}
 ];
 const IOT_FAKES = [
@@ -610,7 +612,7 @@ const IMPL = {
   },
   repair:{
     start(){
-      body.innerHTML = `<div class="pz drop" id="pz"><div class="em" id="pzE"></div><div><small id="pzD"></small><div class="txt" id="pzT"></div></div></div><div class="tray t4" id="tray"></div>`;
+      body.innerHTML = `<div class="pz drop" id="pz"><div class="art pat devimg" id="pzE"></div><div><small id="pzD"></small><div class="txt" id="pzT"></div></div></div><div class="tray t4" id="tray"></div>`;
       this.queue = shuffle(REPAIRS); this.next();
       onDrop = (el,z) => {
         if(locked || z.id!=='pz') return false;
@@ -628,7 +630,7 @@ const IMPL = {
     next(){
       if(!this.queue.length) this.queue = shuffle(REPAIRS);
       this.p = this.queue.pop();
-      $('pzE').textContent = this.p.e; $('pzD').textContent = this.p.d + ' แจ้งว่า'; $('pzT').textContent = this.p.t;
+      $('pzE').innerHTML = `<img src="${DEV_IMG[this.p.k]}" alt="">`; $('pzD').textContent = this.p.d + ' แจ้งว่า'; $('pzT').textContent = this.p.t;
       const wrong = shuffle(REPAIRS.filter(r=>r.a!==this.p.a)).slice(0,3).map(r=>({a:r.a, ok:0}));
       $('tray').innerHTML = shuffle([{a:this.p.a, ok:1}, ...wrong]).map(o=>`<div class="card fix" data-drag data-ok="${o.ok}"><span class="em">🛠️</span>${o.a}</div>`).join('');
     }
@@ -642,7 +644,7 @@ const IMPL = {
         if(el.dataset.ok === '1'){
           el.style.visibility = 'hidden';
           const part = this.p.parts[this.step];
-          const slot = $('slot'+this.step); slot.classList.add('filled'); slot.innerHTML = `<span class="em">${part.e}</span>${part.n}`;
+          const slot = $('slot'+this.step); slot.classList.add('filled'); slot.innerHTML = `${part.img ? `<span class="art simg"><img src="${part.img}" alt=""></span>` : `<span class="em">${part.e}</span>`}${part.n}`;
           this.step++;
           if(this.step >= 4){
             locked = true; addScore(150);
@@ -667,7 +669,7 @@ const IMPL = {
       document.querySelectorAll('.slot').forEach((s,i)=>s.classList.toggle('active', i===this.step));
       const right = {...this.p.parts[this.step], ok:1};
       const fakes = shuffle(IOT_FAKES[this.step]).slice(0,2).map(f=>({...f, ok:0}));
-      $('tray').innerHTML = shuffle([right, ...fakes]).map(o=>`<div class="card" data-drag data-ok="${o.ok}"><span class="em">${o.e}</span>${o.n}</div>`).join('');
+      $('tray').innerHTML = shuffle([right, ...fakes]).map(o=>`<div class="card" data-drag data-ok="${o.ok}">${o.img ? `<span class="art"><img src="${o.img}" alt=""></span>` : `<span class="em">${o.e}</span>`}${o.n}</div>`).join('');
     }
   },
   data:{
