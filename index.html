@@ -119,6 +119,33 @@ h1{font-size:clamp(28px,8vmin,80px);font-weight:600;color:var(--teal-d);text-ali
 .dcols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2vmin;text-align:left}
 .dcol{display:flex;flex-direction:column;gap:.5vmin;font-size:clamp(11px,2vmin,18px);color:var(--ink)}
 .dcol b{font-weight:500;color:#0c447c}
+.sq .in .ico{display:block;width:clamp(22px,6vmin,54px);height:clamp(22px,6vmin,54px)}
+.sq .in .ico.deco{width:clamp(18px,4.6vmin,40px);height:clamp(18px,4.6vmin,40px);opacity:.85}
+.sq .in .ico svg,.badge svg,.art svg,#token svg{width:100%;height:100%;display:block}
+.sq:not(.station):not(.start) .in{background:#fff8ea;border-color:#f2dcb0}
+.sq.station .in{box-shadow:inset 0 -5px 0 rgba(0,0,0,.18)}
+#boardScreen{background:#e3f4ea}
+#token{background:#fff;border:4px solid var(--coral);overflow:hidden;width:clamp(36px,8vmin,72px);height:clamp(36px,8vmin,72px)}
+#token.hop{animation:hop .22s}
+@keyframes hop{50%{margin-top:-1.6vmin}}
+.hosp{position:absolute;left:4%;right:4%;bottom:2%;height:42%;opacity:.95;z-index:0;pointer-events:none}
+.hosp svg{width:100%;height:100%}
+#center>*:not(.hosp){position:relative;z-index:1}
+#center{justify-content:flex-start;padding-top:4%}
+#dice{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:clamp(9px,2vmin,20px);gap:clamp(4px,.9vmin,9px);box-shadow:inset 0 -6px 0 #d3d1c7}
+#dice b{grid-column:1/4;grid-row:1/4;display:flex;align-items:center;justify-content:center;font-size:clamp(40px,9vmin,90px)}
+#dice{align-items:stretch;justify-items:stretch}
+#dice i{border-radius:50%}
+@media (orientation:landscape){.hosp{left:2%;right:auto;width:26%;top:8%;bottom:8%;height:auto}}
+#dice i.on{background:var(--ink)}
+.badge{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;flex:none;vertical-align:middle}
+.badge.sm{width:1.6em;height:1.6em;padding:.28em}
+.badge.big{width:clamp(80px,18vmin,150px);height:clamp(80px,18vmin,150px);padding:3.6vmin;box-shadow:inset 0 -6px 0 rgba(0,0,0,.18)}
+.art{display:block;flex:none}
+.card .art{width:calc(var(--cw)*.58);height:calc(var(--cw)*.58);margin-bottom:.3em}
+.pz .art.pat{width:clamp(70px,17vmin,150px);height:clamp(70px,17vmin,150px)}
+.conf{position:fixed;width:12px;height:16px;border-radius:3px;z-index:300;pointer-events:none;animation:conf 1.2s ease-out forwards}
+@keyframes conf{to{transform:translate(var(--dx),calc(var(--dy) + 60vh)) rotate(var(--r));opacity:0}}
 </style>
 </head>
 <body>
@@ -148,8 +175,9 @@ h1{font-size:clamp(28px,8vmin,80px);font-weight:600;color:var(--teal-d);text-ali
 <section id="boardScreen" class="screen">
   <div id="board">
     <div id="center">
+      <div class="hosp" id="hosp"></div>
       <h2>ทอยเต๋าเลย!</h2>
-      <div id="dice">?</div>
+      <div id="dice"><b>?</b></div>
       <button class="btn primary" id="btnRoll">🎲 ทอยลูกเต๋า</button>
       <div id="progress"></div>
     </div>
@@ -184,6 +212,7 @@ h1{font-size:clamp(28px,8vmin,80px);font-weight:600;color:var(--teal-d);text-ali
   <div class="sub" id="resetIn" style="font-size:clamp(13px,1.3vw,18px)"></div>
 </section>
 
+<script src="art.js"></script>
 <script>
 /* ===== ตั้งค่า (แก้ได้) ===== */
 const CONFIG = {
@@ -431,18 +460,32 @@ function fitViewport(){
   r.setProperty('--ax', VP.x+'px'); r.setProperty('--ay', VP.y+'px');
   if(typeof layoutBoard === 'function') layoutBoard();
 }
-const DECO = ['❤️','💊','🩻','🧬','🩹','🌡️'];
+const FLAG = '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M10 36 V5" stroke="#2d3b3a" stroke-width="3" stroke-linecap="round"/><path d="M11 6 H32 L27 13 L32 20 H11 Z" fill="#e24b4a" stroke="#2d3b3a" stroke-width="2.2" stroke-linejoin="round"/></svg>';
+const stBadge = (st, cls='badge') => `<span class="${cls}" style="background:${st.color}">${ART.st[st.id]}</span>`;
+const DICE_DOTS = {1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+function setDice(n){ $('dice').innerHTML = n ? Array.from({length:9},(_,k)=>`<i class="${DICE_DOTS[n].includes(k)?'on':''}"></i>`).join('') : '<b>?</b>'; }
+function confetti(){
+  const cols = ['#e24b4a','#ef9f27','#1d9e75','#378add','#7f77dd','#d4537e'];
+  for(let k=0;k<36;k++){
+    const c = document.createElement('i'); c.className = 'conf';
+    c.style.left = (40 + Math.random()*20) + 'vw'; c.style.top = '35vh';
+    c.style.background = cols[k%cols.length];
+    c.style.setProperty('--dx', (Math.random()*80-40) + 'vw'); c.style.setProperty('--dy', (Math.random()*50-35) + 'vh');
+    c.style.setProperty('--r', (Math.random()*720-360) + 'deg');
+    document.body.appendChild(c); setTimeout(()=>c.remove(), 1300);
+  }
+}
 function buildBoard(){
   board.querySelectorAll('.sq').forEach(s=>s.remove());
   for(let i=0;i<SQUARES;i++){
     const st = STATIONS.find(s=>s.sq===i);
     const d = document.createElement('div');
     d.className = 'sq'; d.id = 'sq'+i;
-    if(i===0){ d.classList.add('start'); d.innerHTML = '<div class="in"><span class="em" style="opacity:1">🏁</span>เริ่ม</div>'; }
+    if(i===0){ d.classList.add('start'); d.innerHTML = '<div class="in"><span class="ico">'+FLAG+'</span>เริ่ม</div>'; }
     else if(st){
       d.classList.add('station'); if(!st.ready) d.classList.add('locked');
-      d.innerHTML = `<div class="in" style="background:${st.color}"><span class="em">${st.icon}</span>${st.name}${st.ready?'':'<small>เร็ว ๆ นี้</small>'}</div>`;
-    } else d.innerHTML = `<div class="in"><span class="em">${DECO[i%DECO.length]}</span></div>`;
+      d.innerHTML = `<div class="in" style="background:${st.color}"><span class="ico">${ART.st[st.id]}</span>${st.name}${st.ready?'':'<small>เร็ว ๆ นี้</small>'}</div>`;
+    } else d.innerHTML = `<div class="in"><span class="ico deco">${ART.deco[i%ART.deco.length]}</span></div>`;
     board.appendChild(d);
   }
   layoutBoard();
@@ -457,7 +500,7 @@ function layoutBoard(){
   Object.assign($('center').style, {left:(100/COLS)+'%', top:(100/ROWS)+'%', width:((COLS-2)/COLS*100)+'%', height:((ROWS-2)/ROWS*100)+'%'});
   if(G) placeToken(G.pos);
 }
-function placeToken(i){ const {c,r} = sqPos(i); token.style.left = ((c+.5)/COLS*100)+'%'; token.style.top = ((r+.5)/ROWS*100)+'%'; }
+function placeToken(i){ token.classList.remove('hop'); void token.offsetWidth; token.classList.add('hop'); const {c,r} = sqPos(i); token.style.left = ((c+.5)/COLS*100)+'%'; token.style.top = ((r+.5)/ROWS*100)+'%'; }
 window.addEventListener('resize', fitViewport);
 window.addEventListener('orientationchange', ()=>setTimeout(fitViewport, 300));
 if(window.visualViewport){ visualViewport.addEventListener('resize', fitViewport); visualViewport.addEventListener('scroll', fitViewport); }
@@ -470,8 +513,8 @@ const readyStations = () => STATIONS.filter(s=>s.ready);
 function newGame(){
   const target = Math.min(CONFIG.stationsPerGame, readyStations().length);
   G = {pos:0, played:[], scores:{}, total:0, target};
-  buildBoard(); placeToken(0);
-  $('dice').textContent = '?';
+  buildBoard(); placeToken(0); token.innerHTML = ART.student; $('hosp').innerHTML = ART.hospital;
+  setDice(0);
   $('btnRoll').style.display = '';
   updateProgress();
   show('boardScreen');
@@ -484,9 +527,9 @@ async function roll(){
   if(rolling) return; rolling = true;
   $('btnRoll').style.display = 'none';
   const dice = $('dice'); dice.classList.add('roll');
-  for(let k=0;k<12;k++){ dice.textContent = 1+Math.floor(Math.random()*6); await sleep(70); }
+  for(let k=0;k<12;k++){ setDice(1+Math.floor(Math.random()*6)); await sleep(70); }
   dice.classList.remove('roll');
-  const n = 1+Math.floor(Math.random()*6); dice.textContent = n;
+  const n = 1+Math.floor(Math.random()*6); setDice(n);
   await sleep(400);
   for(let k=0;k<n;k++){ G.pos = (G.pos+1)%SQUARES; placeToken(G.pos); await sleep(260); }
   const isTarget = p => STATIONS.some(s=>s.sq===p && s.ready && !G.played.includes(s.id));
@@ -501,9 +544,9 @@ let cur = null, timerId = null, timeLeft = 0, stScore = 0, locked = false;
 const body = $('stbody');
 function openStation(st){
   cur = st; stScore = 0; onDrop = null; clearTimeout(fbTimer); $('fb').className = '';
-  $('stName').textContent = `${st.icon} ${st.name}`;
+  $('stName').innerHTML = `${stBadge(st,'badge sm')} ${st.name}`;
   $('stScore').textContent = 0; $('stTime').textContent = CONFIG.stationTime; $('timeFill').style.width = '100%';
-  body.innerHTML = `<div class="overlay"><div class="big">${st.icon}</div><span class="tag">${st.subject}</span><h2>${st.name}</h2><p>${st.how}</p><p>มีเวลา ${CONFIG.stationTime} วินาที</p><button class="btn primary" id="btnStart">เริ่มภารกิจ</button></div>`;
+  body.innerHTML = `<div class="overlay">${stBadge(st,'badge big')}<span class="tag">${st.subject}</span><h2>${st.name}</h2><p>${st.how}</p><p>มีเวลา ${CONFIG.stationTime} วินาที</p><button class="btn primary" id="btnStart">เริ่มภารกิจ</button></div>`;
   show('station');
   $('btnStart').onclick = runStation;
 }
@@ -522,7 +565,7 @@ function runStation(){
 function addScore(n){ stScore += n; $('stScore').textContent = stScore; }
 let fbTimer = null;
 function feedback(text, good, ms=1300){
-  const fb = $('fb'); fb.textContent = text; fb.className = good ? 'good show' : 'bad show';
+  const fb = $('fb'); fb.textContent = text; fb.className = good ? 'good show' : 'bad show'; if(good) confetti();
   clearTimeout(fbTimer); fbTimer = setTimeout(()=>fb.className='', ms);
 }
 function endStation(){
@@ -538,7 +581,7 @@ function endStation(){
 const IMPL = {
   device:{
     start(){
-      body.innerHTML = `<div class="pz drop" id="pz"><div class="em" id="pzE"></div><div><small>อาการผู้ป่วย</small><div class="txt" id="pzT"></div></div></div><div class="tray" id="tray"></div>`;
+      body.innerHTML = `<div class="pz drop" id="pz"><div class="art pat" id="pzE"></div><div><small>อาการผู้ป่วย</small><div class="txt" id="pzT"></div></div></div><div class="tray" id="tray"></div>`;
       this.queue = shuffle(PATIENTS); this.next();
       onDrop = (el,z) => {
         if(locked || z.id!=='pz') return false;
@@ -556,9 +599,9 @@ const IMPL = {
     next(){
       if(!this.queue.length) this.queue = shuffle(PATIENTS);
       this.p = this.queue.pop();
-      $('pzE').textContent = this.p.e; $('pzT').textContent = this.p.t;
+      $('pzE').innerHTML = ART.pat[this.p.a]; $('pzT').textContent = this.p.t;
       const others = shuffle(Object.keys(DEVICES).filter(k=>k!==this.p.a)).slice(0,4);
-      $('tray').innerHTML = shuffle([this.p.a, ...others]).map(k=>`<div class="card" data-drag data-id="${k}"><span class="em">${DEVICES[k].e}</span>${DEVICES[k].n}</div>`).join('');
+      $('tray').innerHTML = shuffle([this.p.a, ...others]).map(k=>`<div class="card" data-drag data-id="${k}"><span class="art">${ART.dev[k]}</span>${DEVICES[k].n}</div>`).join('');
     }
   },
   repair:{
@@ -682,8 +725,8 @@ function showSummary(){
   let best = null;
   G.played.forEach(id=>{ if(!best || G.scores[id] > G.scores[best]) best = id; });
   const st = STATIONS.find(s=>s.id===best);
-  const list = G.played.map(id=>{ const s = STATIONS.find(x=>x.id===id); return `${s.icon} ${s.name}: ${G.scores[id]}`; }).join('<br>');
-  $('careerCard').innerHTML = `<div class="sub">คุณเหมาะกับ…</div><div class="em">${st.icon}</div><h2>${st.career}</h2><p>${st.careerDesc}</p><div class="scoreList">${list}</div><span class="tag">เรียนได้ที่ ${CONFIG.programName}</span>`;
+  const list = G.played.map(id=>{ const s = STATIONS.find(x=>x.id===id); return `${s.name}: ${G.scores[id]}`; }).join('<br>');
+  $('careerCard').innerHTML = `<div class="sub">คุณเหมาะกับ…</div>${stBadge(st,'badge big')}<h2>${st.career}</h2><p>${st.careerDesc}</p><div class="scoreList">${list}</div><span class="tag">เรียนได้ที่ ${CONFIG.programName}</span>`;
   const qr = $('qr'); qr.innerHTML = '';
   if(window.QRCode) { const q = Math.round(Math.min(210, Math.max(110, Math.min(VP.w,VP.h)*0.24))); new QRCode(qr, {text:CONFIG.applyUrl, width:q, height:q}); }
   else qr.textContent = CONFIG.applyUrl;
